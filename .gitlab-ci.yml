@@ -105,6 +105,7 @@ code_quality:
       codequality: [gl-code-quality-report.json]
 
 sast:
+  stage: security
   image: docker:stable
   variables:
     DOCKER_DRIVER: overlay2
@@ -123,6 +124,7 @@ sast:
       sast: gl-sast-report.json
 
 dependency_scanning:
+  stage: security
   image: docker:stable
   variables:
     DOCKER_DRIVER: overlay2

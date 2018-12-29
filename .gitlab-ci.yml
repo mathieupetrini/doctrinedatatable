@@ -15,7 +15,7 @@ cache:
     - vendor/
 
 before_script:
-  - bash ci/docker_install.sh > /dev/null
+  - bash ./ci/docker_install.sh > /dev/null
   - wget https://composer.github.io/installer.sig -O - -q | tr -d '\n' > installer.sig
   - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
   - php -r "if (hash_file('SHA384', 'composer-setup.php') === file_get_contents('installer.sig')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
@@ -62,15 +62,7 @@ danger:
 security_checker:
   image: php:7.2
   script:
-    - composer install
-    - ./api/vendor/sensiolabs/security-checker/security-checker security:check composer.lock
-  stage: security
-
-npm_audit:
-  image: tetraweb/php
-  script:
-    - npm install
-    - npm audit
+    - ./vendor/sensiolabs/security-checker/security-checker security:check composer.lock
   stage: security
 
 phpcs_security_audit:
@@ -82,7 +74,6 @@ phpcs_security_audit:
 php_lint:
   image: php:7.2
   script:
-    - composer install
     - ./vendor/bin/php-cs-fixer fix --dry-run --config=.php_cs.dist --using-cache=no --diff --diff-format=udiff --allow-risky=yes
   stage: lint
 
@@ -90,7 +81,6 @@ phpunit:
   image: php:7.2
   stage: build
   script:
-    - composer install
     - cp phpunit.xml.dist phpunit.xml
     - ./vendor/bin/phpunit --coverage-text --configuration phpunit.xml
   artifacts:

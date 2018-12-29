@@ -5,7 +5,16 @@ stages:
   - build
   - quality
 
-image: docker:stable
+image: tetraweb/php
+
+before_script:
+  - apt-get update
+  - apt-get install zip unzip
+  - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+  - php composer-setup.php
+  - php -r "unlink('composer-setup.php');"
+  - php composer.phar install
+  - npm install
 
 variables:
   GIT_STRATEGY: fetch
@@ -44,30 +53,34 @@ danger:
   allow_failure: true
 
 security_checker:
+  image: tetraweb/php
   script:
     - composer install
     - ./api/vendor/sensiolabs/security-checker/security-checker security:check composer.lock
   stage: security
 
 npm_audit:
+  image: tetraweb/php
   script:
     - npm install
     - npm audit
   stage: security
-  allow_failure: true
 
 phpcs_security_audit:
+  image: tetraweb/php
   script:
     - ./vendor/bin/phpcs --extensions=php --standard=./.php_cs_audit.xml ./src/
   stage: security
 
 php_lint:
+  image: tetraweb/php
   script:
     - composer install
     - ./vendor/bin/php-cs-fixer fix --dry-run --config=.php_cs.dist --using-cache=no --diff --diff-format=udiff --allow-risky=yes
   stage: lint
 
 phpunit:
+  image: tetraweb/php
   stage: build
   script:
     - composer install
@@ -78,6 +91,7 @@ phpunit:
       - tests/coverage/
 
 js_compilation:
+  image: tetraweb/php
   stage: build
   script:
     - npm install

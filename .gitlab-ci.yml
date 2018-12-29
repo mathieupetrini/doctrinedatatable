@@ -5,16 +5,23 @@ stages:
   - build
   - quality
 
-image: tetraweb/php
+image: php:7.2
+
+# Composer stores all downloaded packages in the vendor/ directory.
+# Do not use the following if the vendor/ directory is committed to
+# your git repository.
+cache:
+  paths:
+    - vendor/
 
 before_script:
-  - apt-get update
-  - apt-get install zip unzip
+  - bash ci/docker_install.sh > /dev/null
+  - wget https://composer.github.io/installer.sig -O - -q | tr -d '\n' > installer.sig
   - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+  - php -r "if (hash_file('SHA384', 'composer-setup.php') === file_get_contents('installer.sig')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
   - php composer-setup.php
-  - php -r "unlink('composer-setup.php');"
+  - php -r "unlink('composer-setup.php'); unlink('installer.sig');"
   - php composer.phar install
-  - npm install
 
 variables:
   GIT_STRATEGY: fetch
@@ -53,7 +60,7 @@ danger:
   allow_failure: true
 
 security_checker:
-  image: tetraweb/php
+  image: php:7.2
   script:
     - composer install
     - ./api/vendor/sensiolabs/security-checker/security-checker security:check composer.lock
@@ -67,20 +74,20 @@ npm_audit:
   stage: security
 
 phpcs_security_audit:
-  image: tetraweb/php
+  image: php:7.2
   script:
     - ./vendor/bin/phpcs --extensions=php --standard=./.php_cs_audit.xml ./src/
   stage: security
 
 php_lint:
-  image: tetraweb/php
+  image: php:7.2
   script:
     - composer install
     - ./vendor/bin/php-cs-fixer fix --dry-run --config=.php_cs.dist --using-cache=no --diff --diff-format=udiff --allow-risky=yes
   stage: lint
 
 phpunit:
-  image: tetraweb/php
+  image: php:7.2
   stage: build
   script:
     - composer install

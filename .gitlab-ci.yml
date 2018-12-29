@@ -14,15 +14,6 @@ cache:
   paths:
     - vendor/
 
-before_script:
-  - bash ./ci/docker_install.sh > /dev/null
-  - wget https://composer.github.io/installer.sig -O - -q | tr -d '\n' > installer.sig
-  - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-  - php -r "if (hash_file('SHA384', 'composer-setup.php') === file_get_contents('installer.sig')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-  - php composer-setup.php
-  - php -r "unlink('composer-setup.php'); unlink('installer.sig');"
-  - php composer.phar install
-
 variables:
   GIT_STRATEGY: fetch
   DANGER_GITLAB_API_TOKEN: x5e9CTdw9QewEXKdE2v_
@@ -47,6 +38,16 @@ variables:
 services:
   - docker:dind
 
+.php_script: &php_script
+  before_script:
+    - bash ./ci/docker_install.sh > /dev/null
+    - wget https://composer.github.io/installer.sig -O - -q | tr -d '\n' > installer.sig
+    - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    - php -r "if (hash_file('SHA384', 'composer-setup.php') === file_get_contents('installer.sig')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+    - php composer-setup.php
+    - php -r "unlink('composer-setup.php'); unlink('installer.sig');"
+    - php composer.phar install
+
 danger:
   stage: prepare
   script:
@@ -60,24 +61,28 @@ danger:
   allow_failure: true
 
 security_checker:
+  <<: *php_script
   image: php:7.2
   script:
     - ./vendor/sensiolabs/security-checker/security-checker security:check composer.lock
   stage: security
 
 phpcs_security_audit:
+  <<: *php_script
   image: php:7.2
   script:
     - ./vendor/bin/phpcs --extensions=php --standard=./.php_cs_audit.xml ./src/
   stage: security
 
 php_lint:
+  <<: *php_script
   image: php:7.2
   script:
     - ./vendor/bin/php-cs-fixer fix --dry-run --config=.php_cs.dist --using-cache=no --diff --diff-format=udiff --allow-risky=yes
   stage: lint
 
 phpunit:
+  <<: *php_script
   image: php:7.2
   stage: build
   script:

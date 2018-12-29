@@ -1,0 +1,20 @@
+releasedDir: changelogs
+unreleasedDir: changelogs/unreleased
+types:
+  - added
+  - fixed
+  - changed
+  - deprecated
+  - removed
+  - security
+  - performance
+  - other
+releaseHeading: "##"
+typeHeading: "###"
+changelogFile: CHANGELOG.md
+templateBlocks:
+  merge_request: " !${merge_request}"
+  author: " (${author})"
+  client: " - ${client}"
+entryTemplate: "${title}__.__${merge_request}${client}${author}"
+stripLinkPattern: "(!w*)"

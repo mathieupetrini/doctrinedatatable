@@ -13,6 +13,7 @@ image: php:7.2
 cache:
   paths:
     - vendor/
+    - node_modules/
 
 variables:
   GIT_STRATEGY: fetch
@@ -92,19 +93,11 @@ phpunit:
     paths:
       - tests/coverage/
 
-js_compilation:
-  image: tetraweb/php
-  stage: build
-  script:
-    - npm install
-    - ./node_modules/.bin/grunt
-
 code_quality:
   stage: quality
   image: docker:stable
   variables:
     DOCKER_DRIVER: overlay2
-  allow_failure: true
   tags:
     - code_quality
   services:
@@ -125,7 +118,6 @@ sast:
   image: docker:stable
   variables:
     DOCKER_DRIVER: overlay2
-  allow_failure: true
   services:
     - docker:stable-dind
   script:
@@ -144,7 +136,6 @@ dependency_scanning:
   image: docker:stable
   variables:
     DOCKER_DRIVER: overlay2
-  allow_failure: true
   services:
     - docker:stable-dind
   script:

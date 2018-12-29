@@ -20,5 +20,5 @@ plugins:
 exclude_patterns:
   - ".bundle/"
   - "node_modules/*"
-  - "api/vendor/*"
+  - "vendor/*"
   - "**/*.js"

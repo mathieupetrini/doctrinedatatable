@@ -1,0 +1,31 @@
+{
+    "name": "mpetrini/doctrinedatatable",
+    "description": "Bridge between jQuery Datatable ServerSide and Doctrine ORM",
+    "keywords": ["datatable", "doctrine", "jquery"],
+    "type": "library",
+    "require": {
+        "php": "^7.1",
+        "doctrine/orm": "^2.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.0",
+        "friendsofphp/php-cs-fixer": "^2.14@dev",
+        "pheromone/phpcs-security-audit": "dev-master"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "mpetrini",
+            "email": "mathieupetrini@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "DoctrineDatatable\\": "src/DoctrineDatatable/"
+        },
+        "exclude-from-classmap": [
+            "**/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

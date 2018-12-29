@@ -1,0 +1,141 @@
+stages:
+  - prepare
+  - security
+  - lint
+  - build
+  - quality
+
+image: docker:stable
+
+variables:
+  GIT_STRATEGY: fetch
+  DANGER_GITLAB_API_TOKEN: x5e9CTdw9QewEXKdE2v_
+  DANGER_GITLAB_HOST: gitlab.com
+  DANGER_GITLAB_API_BASE_URL: https://gitlab.com/api/v4
+  # When using dind service we need to instruct docker, to talk with the
+  # daemon started inside of the service. The daemon is available with
+  # a network connection instead of the default /var/run/docker.sock socket.
+  #
+  # The 'docker' hostname is the alias of the service container as described at
+  # https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#accessing-the-services
+  #
+  # Note that if you're using Kubernetes executor, the variable should be set to
+  # tcp://localhost:2375 because of how Kubernetes executor connects services
+  # to the job container
+  DOCKER_HOST: tcp://docker:2375/
+  # When using dind, it's wise to use the overlayfs driver for
+  # improved performance.
+  DOCKER_DRIVER: overlay2
+  DATABASE_URL: "mysql://qrieu_preprod:Héc0ne@192.168.1.240:3306/qrieu_test"
+
+services:
+  - docker:dind
+
+danger:
+  stage: prepare
+  script:
+    - rvm --default use 2.3
+    - bundle install --path vendor/bundle
+    - bundle exec danger --fail-on-errors=true
+  except:
+    - master
+  tags:
+    - ruby
+  allow_failure: true
+
+security_checker:
+  script:
+    - composer install
+    - ./api/vendor/sensiolabs/security-checker/security-checker security:check composer.lock
+  stage: security
+
+npm_audit:
+  script:
+    - npm install
+    - npm audit
+  stage: security
+  allow_failure: true
+
+phpcs_security_audit:
+  script:
+    - ./vendor/bin/phpcs --extensions=php --standard=./.php_cs_audit.xml ./src/
+  stage: security
+
+php_lint:
+  script:
+    - composer install
+    - ./vendor/bin/php-cs-fixer fix --dry-run --config=.php_cs.dist --using-cache=no --diff --diff-format=udiff --allow-risky=yes
+  stage: lint
+
+phpunit:
+  stage: build
+  script:
+    - composer install
+    - cp phpunit.xml.dist phpunit.xml
+    - ./vendor/bin/phpunit --coverage-text --configuration phpunit.xml
+  artifacts:
+    paths:
+      - tests/coverage/
+
+js_compilation:
+  stage: build
+  script:
+    - npm install
+    - ./node_modules/.bin/grunt
+
+code_quality:
+  stage: quality
+  image: docker:stable
+  variables:
+    DOCKER_DRIVER: overlay2
+  allow_failure: true
+  tags:
+    - code_quality
+  services:
+    - docker:stable-dind
+  script:
+    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
+    - docker run
+      --env SOURCE_CODE="$PWD"
+      --volume "$PWD":/code
+      --volume /var/run/docker.sock:/var/run/docker.sock
+      "registry.gitlab.com/gitlab-org/security-products/codequality:$SP_VERSION" /code
+  artifacts:
+    reports:
+      codequality: [gl-code-quality-report.json]
+
+sast:
+  image: docker:stable
+  variables:
+    DOCKER_DRIVER: overlay2
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  script:
+    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
+    - docker run
+      --env SAST_CONFIDENCE_LEVEL="${SAST_CONFIDENCE_LEVEL:-3}"
+      --volume "$PWD:/code"
+      --volume /var/run/docker.sock:/var/run/docker.sock
+      "registry.gitlab.com/gitlab-org/security-products/sast:$SP_VERSION" /app/bin/run /code
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+
+dependency_scanning:
+  image: docker:stable
+  variables:
+    DOCKER_DRIVER: overlay2
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  script:
+    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
+    - docker run
+      --env DEP_SCAN_DISABLE_REMOTE_CHECKS="${DEP_SCAN_DISABLE_REMOTE_CHECKS:-false}"
+      --volume "$PWD:/code"
+      --volume /var/run/docker.sock:/var/run/docker.sock
+      "registry.gitlab.com/gitlab-org/security-products/dependency-scanning:$SP_VERSION" /code
+  artifacts:
+    reports:
+      dependency_scanning: gl-dependency-scanning-report.json

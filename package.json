@@ -1,0 +1,11 @@
+{
+  "name": "doctrinedatatable",
+  "devDependencies": {
+    "changelog-manager": "https://gitlab.com/changelogs/changelog-manager#master",
+    "grunt": "^1.0.3",
+    "grunt-contrib-uglify": "^3.3.0"
+  },
+  "dependencies": {
+    "datatables.net": "^1.10.16"
+  }
+}

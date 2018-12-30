@@ -79,21 +79,27 @@ class Column
     /**
      * PRIVATE METHODS.
      */
+
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param string       $data
+     *
+     * @throws ResolveColumnNotHandle
+     */
     private function setParameter(QueryBuilder &$query, string $data): void
     {
-        if (\is_string($this->resolve)) {
-            $query->setParameter(
-                $this->alias,
-                str_replace(':'.$this->alias, $data)
-            );
-        } elseif (\is_callable($this->resolve)) {
-            $query->setParameter(
-                $this->alias,
-                $this->resolve($data)
-            );
-        } else {
+        if (!\is_string($this->resolve) && !\is_callable($this->resolve)) {
             throw new ResolveColumnNotHandle();
         }
+
+        $query->setParameter(
+            $this->alias,
+            \is_string($this->resolve) ?
+                str_replace(':'.$this->alias, $data, $this->resolve) :
+                \call_user_func($this->resolve, $data)
+        );
     }
 
     /**
@@ -104,14 +110,18 @@ class Column
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
      * @param QueryBuilder $query
+     * @param mixed        $data
+     *
+     * @throws ResolveColumnNotHandle
+     * @throws WhereColumnNotHandle
      */
     public function where(QueryBuilder &$query, $data): void
     {
-        if (\is_string($this->where) || $this->where instanceof Expr) {
-            $query->andWhere($this->where);
-        } else {
+        if (!\is_string($this->where) && !$this->where instanceof Expr) {
             throw new WhereColumnNotHandle();
         }
+
+        $query->andWhere($this->where);
 
         $this->setParameter($query, $data);
     }
@@ -119,6 +129,14 @@ class Column
     /**
      * GETTERS / SETTERS.
      */
+
+    /**
+     * @return string
+     */
+    public function getAlias(): string
+    {
+        return $this->alias;
+    }
 
     /**
      * @return string

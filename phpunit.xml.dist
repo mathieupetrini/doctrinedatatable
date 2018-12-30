@@ -4,7 +4,7 @@
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/5.2/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         bootstrap="vendor/autoload.php"
+         bootstrap="src/DoctrineDatatable/Tests/autoload.php"
          failOnRisky="true"
          failOnWarning="true"
 >
@@ -19,7 +19,8 @@
 
     <testsuites>
         <testsuite name="Global Test Suite">
-            <directory>./src/DoctrineDatatable/*/Tests/</directory>
+            <directory>./src/DoctrineDatatable/**/Tests/</directory>
+            <directory>./src/DoctrineDatatable/Tests/</directory>
         </testsuite>
     </testsuites>
 

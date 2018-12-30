@@ -76,7 +76,7 @@ phpunit:
   stage: build
   script:
     - cp phpunit.xml.dist phpunit.xml
-    - ./vendor/bin/phpunit --coverage-text --colors=never --configuration phpunit.xml
+    - ./vendor/bin/phpunit --coverage-text --colors=never --configuration phpunit.xml --testsuite "Global Test Suite"
   artifacts:
     paths:
       - tests/coverage/

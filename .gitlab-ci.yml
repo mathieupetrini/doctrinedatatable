@@ -75,6 +75,8 @@ phpunit:
   image: php:7.2
   stage: build
   script:
+    - pecl install xdebug
+    - php --ini
     - cp phpunit.xml.dist phpunit.xml
     - ./vendor/bin/phpunit --coverage-text --colors=never --configuration phpunit.xml --testsuite "Global Test Suite"
   artifacts:

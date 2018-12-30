@@ -76,7 +76,7 @@ phpunit:
   stage: build
   script:
     - cp phpunit.xml.dist phpunit.xml
-    - ./vendor/bin/phpunit --coverage-text --configuration phpunit.xml
+    - ./vendor/bin/phpunit --coverage-text --colors=never --configuration phpunit.xml
   artifacts:
     paths:
       - tests/coverage/

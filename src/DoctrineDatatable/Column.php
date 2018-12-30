@@ -133,6 +133,14 @@ class Column
     /**
      * @return string
      */
+    public function getAlias(): string
+    {
+        return $this->alias;
+    }
+
+    /**
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;

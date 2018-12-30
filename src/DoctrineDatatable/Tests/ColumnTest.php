@@ -35,11 +35,20 @@ class ColumnTest extends OrmTestCase
         $this->entity_manager = $this->_getTestEntityManager();
     }
 
+    public function testGetAlias(): void
+    {
+        $this->assertEquals('firstname', self::$column->getAlias());
+    }
+
     public function testGetName(): void
     {
         $this->assertEquals('e.firstname', self::$column->getName());
     }
 
+    /**
+     * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
+     */
     public function testWhereWithStringResolve(): void
     {
         $query = $this->entity_manager->createQueryBuilder()
@@ -67,6 +76,10 @@ class ColumnTest extends OrmTestCase
         );
     }
 
+    /**
+     * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
+     */
     public function testWhereWithCallableResolve(): void
     {
         $query = $this->entity_manager->createQueryBuilder()

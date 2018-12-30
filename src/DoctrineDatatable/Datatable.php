@@ -3,6 +3,7 @@
 namespace DoctrineDatatable;
 
 use Doctrine\ORM\QueryBuilder;
+use DoctrineDatatable\Exception\MinimumColumn;
 
 class Datatable
 {
@@ -31,12 +32,27 @@ class Datatable
      */
     public const RESULT_PER_PAGE = 30;
 
+    /**
+     * Datatable constructor.
+     *
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param string       $identifier
+     * @param array        $columns
+     * @param int|null     $result_per_page
+     *
+     * @throws MinimumColumn
+     */
     public function __construct(
         QueryBuilder $query,
         string $identifier,
         array $columns,
         ?int $result_per_page = self::RESULT_PER_PAGE
     ) {
+        if (empty($columns)) {
+            throw new MinimumColumn();
+        }
         $this->query = $query;
         $this->identifier = $identifier;
         $this->columns = $columns;
@@ -56,11 +72,8 @@ class Datatable
     {
         $index = array_search(
             $alias,
-            // Aliases in an array
-            array_column(
-                $this->columns,
-                'alias',
-                'alias'
+            array_keys(
+                array_column($this->columns, 'alias', 'alias')
             )
         );
 
@@ -98,23 +111,28 @@ class Datatable
     private function createQueryResult(): QueryBuilder
     {
         $query = clone $this->query;
-        $query->select($this->identifier);
-        foreach ($this->columns as $alias => $column) {
-            $this->processColumnSelect($query, $alias, $column);
+        $query->select($this->processColumnIdentifier($query));
+        foreach ($this->columns as $column) {
+            $this->processColumnSelect($query, $column);
         }
 
         return $query;
     }
 
-    private function processColumnSelect(QueryBuilder &$query, string $alias, Column $column): void
+    private function processColumnIdentifier(QueryBuilder &$query): string
     {
-        $query->addSelect($column->getName().' AS '.$alias);
+        return $query->getRootAliases()[0].'.'.$this->identifier;
+    }
+
+    private function processColumnSelect(QueryBuilder &$query, Column $column): void
+    {
+        $query->addSelect($column->getName().' AS '.$column->getAlias());
     }
 
     private function orderBy(QueryBuilder &$query, int $index, string $direction): self
     {
         $query->orderBy(
-            \array_slice($this->columns, $index, 1)['alias'],
+            \array_slice($this->columns, $index, 1)[0]->getAlias(),
             $direction
         );
 
@@ -139,9 +157,9 @@ class Datatable
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
      * @param QueryBuilder $query
-     * @param int $index
-     * @param string $direction
-     * @param int $start
+     * @param int          $index
+     * @param string       $direction
+     * @param int          $start
      *
      * @return array
      */
@@ -161,15 +179,18 @@ class Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
+     * @param QueryBuilder $query
+     *
      * @return int
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    private function count(): int
+    private function count(QueryBuilder $query): int
     {
-        $query = clone $this->query;
+        $query = clone $query;
 
-        return (int) ($query->select('COUNT(DISTINCT '.$this->identifier.')')
+        return (int) ($query->select('COUNT(DISTINCT '.$this->processColumnIdentifier($query).')')
+            ->resetDQLPart('orderBy')
             ->getQuery()
             ->getSingleScalarResult());
     }
@@ -198,10 +219,11 @@ class Datatable
     ): array {
         $query = $this->createQueryResult();
         $this->createFoundationQuery($query, $filtres);
+
         $data = $this->result($query, $index, $direction, $start);
 
         return array(
-            'recordsTotal' => $this->count(),
+            'recordsTotal' => $this->count($query),
             'recordsFiltered' => \count($data),
             'data' => $data,
         );

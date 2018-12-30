@@ -103,15 +103,7 @@ class DatatableTest extends OrmFunctionalTestCase
             'st1',
             $result['data'][0]['status']
         );
-    }
 
-    /**
-     * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
-     * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function testGetResultWithDirection(): void
-    {
         $result = $this->datatable->get(
             array(),
             1,

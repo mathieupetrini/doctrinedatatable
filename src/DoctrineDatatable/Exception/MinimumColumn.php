@@ -3,8 +3,7 @@
 namespace DoctrineDatatable\Exception;
 
 /**
- * Class MinimumColumn
- * @package DoctrineDatatable\Exception
+ * Class MinimumColumn.
  *
  * @codeCoverageIgnore
  */

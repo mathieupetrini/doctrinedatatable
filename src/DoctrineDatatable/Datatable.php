@@ -201,9 +201,9 @@ class Datatable
 
     /**
      * @param array  $filtres
-     * @param int    $index (optional) (default=0)
+     * @param int    $index     (optional) (default=0)
      * @param string $direction (optional) (default='ASC')
-     * @param int    $start (optional) (default=0)
+     * @param int    $start     (optional) (default=0)
      *
      * @return array
      *

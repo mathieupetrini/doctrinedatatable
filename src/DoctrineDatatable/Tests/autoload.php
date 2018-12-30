@@ -8,3 +8,4 @@ require_once __DIR__.'/../../../vendor/doctrine/orm/tests/Doctrine/Tests/Mocks/C
 require_once __DIR__.'/../../../vendor/doctrine/orm/tests/Doctrine/Tests/Mocks/DriverMock.php';
 require_once __DIR__.'/../../../vendor/doctrine/orm/tests/Doctrine/Tests/DoctrineTestCase.php';
 require_once __DIR__.'/../../../vendor/doctrine/orm/tests/Doctrine/Tests/OrmTestCase.php';
+require_once __DIR__.'/../../../vendor/doctrine/orm/tools/sandbox/Entities/User.php';

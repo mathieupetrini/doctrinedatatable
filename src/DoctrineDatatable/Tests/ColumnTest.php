@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\Tests\OrmTestCase;
 use DoctrineDatatable\Column;
-use DoctrineDatatable\Tests\Models\User;
+use Entities\User;
 
 /**
  * Class ColumnTest.

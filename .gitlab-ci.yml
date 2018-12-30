@@ -76,6 +76,7 @@ phpunit:
   stage: build
   script:
     - pecl install xdebug
+    - echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini
     - php --ini
     - cp phpunit.xml.dist phpunit.xml
     - ./vendor/bin/phpunit --coverage-text --colors=never --configuration phpunit.xml --testsuite "Global Test Suite"

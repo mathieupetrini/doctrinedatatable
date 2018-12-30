@@ -16,7 +16,7 @@ class ColumnTest extends OrmTestCase
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    private $entity_manager;
 
     /**
      * @var Column
@@ -26,13 +26,13 @@ class ColumnTest extends OrmTestCase
     /**
      * @var Column
      */
-    private static $column_with_resolve_callable;
+    private static $columnWithResolveCallable;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->em = $this->_getTestEntityManager();
+        $this->entity_manager = $this->_getTestEntityManager();
     }
 
     public function testGetName(): void
@@ -42,7 +42,7 @@ class ColumnTest extends OrmTestCase
 
     public function testWhereWithStringResolve(): void
     {
-        $query = $this->em->createQueryBuilder()
+        $query = $this->entity_manager->createQueryBuilder()
             ->select('u')
             ->from(User::class, 'u');
 
@@ -51,12 +51,12 @@ class ColumnTest extends OrmTestCase
             10
         );
 
-        $where_part = $query->getDQLPart('where');
+        $wherePart = $query->getDQLPart('where');
 
-        $this->assertCount(1, $where_part->getParts());
+        $this->assertCount(1, $wherePart->getParts());
         $this->assertEquals(
             'e.firstname = :firstname',
-            $where_part->getParts()[0]
+            $wherePart->getParts()[0]
         );
 
         $this->assertInstanceOf(Parameter::class, $query->getParameter('firstname'));
@@ -69,21 +69,21 @@ class ColumnTest extends OrmTestCase
 
     public function testWhereWithCallableResolve(): void
     {
-        $query = $this->em->createQueryBuilder()
+        $query = $this->entity_manager->createQueryBuilder()
             ->select('u')
             ->from(User::class, 'u');
 
-        self::$column_with_resolve_callable->where(
+        self::$columnWithResolveCallable->where(
             $query,
             'N°10'
         );
 
-        $where_part = $query->getDQLPart('where');
+        $wherePart = $query->getDQLPart('where');
 
-        $this->assertCount(1, $where_part->getParts());
+        $this->assertCount(1, $wherePart->getParts());
         $this->assertEquals(
             'e.firstname = :firstname',
-            $where_part->getParts()[0]
+            $wherePart->getParts()[0]
         );
 
         $this->assertInstanceOf(Parameter::class, $query->getParameter('firstname'));
@@ -103,7 +103,7 @@ class ColumnTest extends OrmTestCase
             ':firstname'
         );
 
-        self::$column_with_resolve_callable = new Column(
+        self::$columnWithResolveCallable = new Column(
             'firstname',
             'e.firstname',
             'e.firstname = :firstname',

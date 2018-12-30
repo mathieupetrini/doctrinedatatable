@@ -201,9 +201,9 @@ class Datatable
 
     /**
      * @param array  $filtres
-     * @param int    $index
-     * @param string $direction
-     * @param int    $start
+     * @param int    $index (optional) (default=0)
+     * @param string $direction (optional) (default='ASC')
+     * @param int    $start (optional) (default=0)
      *
      * @return array
      *
@@ -213,9 +213,9 @@ class Datatable
      */
     public function get(
         array $filtres,
-        int $index,
-        string $direction,
-        int $start
+        int $index = 0,
+        string $direction = 'ASC',
+        int $start = 0
     ): array {
         $query = $this->createQueryResult();
         $this->createFoundationQuery($query, $filtres);

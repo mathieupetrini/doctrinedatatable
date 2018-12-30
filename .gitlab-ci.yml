@@ -49,20 +49,6 @@ services:
     - php -r "unlink('composer-setup.php'); unlink('installer.sig');"
     - php composer.phar install
 
-danger:
-  stage: prepare
-  image: ruby:2.6
-  script:
-    - apt-get update -qy
-    - apt-get install -y nodejs
-    - bundle install --path vendor/bundle
-    - bundle exec danger --fail-on-errors=true
-  except:
-    - master
-  tags:
-    - ruby
-  allow_failure: true
-
 security_checker:
   <<: *php_script
   image: php:7.2

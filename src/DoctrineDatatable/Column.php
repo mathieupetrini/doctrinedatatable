@@ -79,17 +79,26 @@ class Column
     /**
      * PRIVATE METHODS.
      */
+
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param string       $data
+     *
+     * @throws ResolveColumnNotHandle
+     */
     private function setParameter(QueryBuilder &$query, string $data): void
     {
         if (\is_string($this->resolve)) {
             $query->setParameter(
                 $this->alias,
-                str_replace(':'.$this->alias, $data)
+                str_replace(':'.$this->alias, $data, $this->resolve)
             );
         } elseif (\is_callable($this->resolve)) {
             $query->setParameter(
                 $this->alias,
-                $this->resolve($data)
+                \call_user_func($this->resolve, $data)
             );
         } else {
             throw new ResolveColumnNotHandle();
@@ -104,6 +113,10 @@ class Column
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
      * @param QueryBuilder $query
+     * @param mixed        $data
+     *
+     * @throws ResolveColumnNotHandle
+     * @throws WhereColumnNotHandle
      */
     public function where(QueryBuilder &$query, $data): void
     {

@@ -16,7 +16,7 @@ class ColumnTest extends OrmTestCase
     /**
      * @var EntityManagerInterface
      */
-    private $entity_manager;
+    private $entityManager;
 
     /**
      * @var Column
@@ -32,7 +32,7 @@ class ColumnTest extends OrmTestCase
     {
         parent::setUp();
 
-        $this->entity_manager = $this->_getTestEntityManager();
+        $this->entityManager = $this->_getTestEntityManager();
     }
 
     public function testGetAlias(): void
@@ -51,7 +51,7 @@ class ColumnTest extends OrmTestCase
      */
     public function testWhereWithStringResolve(): void
     {
-        $query = $this->entity_manager->createQueryBuilder()
+        $query = $this->entityManager->createQueryBuilder()
             ->select('u')
             ->from(User::class, 'u');
 
@@ -82,7 +82,7 @@ class ColumnTest extends OrmTestCase
      */
     public function testWhereWithCallableResolve(): void
     {
-        $query = $this->entity_manager->createQueryBuilder()
+        $query = $this->entityManager->createQueryBuilder()
             ->select('u')
             ->from(User::class, 'u');
 

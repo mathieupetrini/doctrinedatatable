@@ -7,6 +7,12 @@ use Doctrine\Tests\OrmFunctionalTestCase;
 use DoctrineDatatable\Column;
 use DoctrineDatatable\Datatable;
 
+/**
+ * Class DatatableTest
+ * @package DoctrineDatatable\Tests
+ *
+ * @codeCoverageIgnore
+ */
 class DatatableTest extends OrmFunctionalTestCase
 {
     /**

@@ -10,6 +10,8 @@ use Entities\User;
 
 /**
  * Class ColumnTest.
+ *
+ * @codeCoverageIgnore
  */
 class ColumnTest extends OrmTestCase
 {

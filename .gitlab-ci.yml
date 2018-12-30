@@ -52,6 +52,8 @@ services:
 danger:
   stage: prepare
   script:
+    - apt-get update -qy
+    - apt-get install -y nodejs
     - bundle install --path vendor/bundle
     - bundle exec danger --fail-on-errors=true
   except:

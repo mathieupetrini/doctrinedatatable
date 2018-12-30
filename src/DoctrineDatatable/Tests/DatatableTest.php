@@ -92,10 +92,7 @@ class DatatableTest extends OrmFunctionalTestCase
     public function testGetResultWithoutFilter(): void
     {
         $result = $this->datatable->get(
-            array(),
-            0,
-            'ASC',
-            0
+            array()
         );
 
         $this->assertEquals(4, $result['recordsTotal']);
@@ -110,8 +107,7 @@ class DatatableTest extends OrmFunctionalTestCase
         $result = $this->datatable->get(
             array(),
             1,
-            'DESC',
-            0
+            'DESC'
         );
 
         $this->assertEquals(4, $result['recordsTotal']);

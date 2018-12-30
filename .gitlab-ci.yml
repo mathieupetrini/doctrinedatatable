@@ -52,7 +52,6 @@ services:
 danger:
   stage: prepare
   script:
-    - rvm --default use 2.3
     - bundle install --path vendor/bundle
     - bundle exec danger --fail-on-errors=true
   except:

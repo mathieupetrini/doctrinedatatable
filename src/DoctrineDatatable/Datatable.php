@@ -69,16 +69,27 @@ class Datatable
             null;
     }
 
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param array        $filtres
+     *
+     * @return QueryBuilder
+     *
+     * @throws Exception\ResolveColumnNotHandle
+     * @throws Exception\WhereColumnNotHandle
+     */
     private function createFoundationQuery(QueryBuilder &$query, array $filtres): QueryBuilder
     {
         foreach ($filtres as $alias => $filtre) {
-            if (!empty($filtre)) {
-                $column = $this->getColumnFromAlias($alias);
-                if ($column instanceof Column) {
-                    $column->where($query, $filtre);
-                }
+            $column = $this->getColumnFromAlias($alias);
+            if ($column instanceof Column && !empty($filtre)) {
+                $column->where($query, $filtre);
             }
         }
+
+        return $query;
     }
 
     /**
@@ -110,10 +121,18 @@ class Datatable
         return $this;
     }
 
+    /**
+     * @param QueryBuilder $query
+     * @param int          $start
+     *
+     * @return Datatable
+     */
     private function limit(QueryBuilder &$query, int $start): self
     {
         $query->setFirstResult($start)
             ->setMaxResults($this->result_per_page);
+
+        return $this;
     }
 
     /**
@@ -133,6 +152,13 @@ class Datatable
             ->getResult();
     }
 
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @return int
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
     public function count(): int
     {
         $query = clone $this->query;
@@ -142,13 +168,26 @@ class Datatable
             ->getSingleScalarResult());
     }
 
+    /**
+     * @param array  $filtres
+     * @param int    $index
+     * @param string $direction
+     * @param int    $start
+     *
+     * @return array
+     *
+     * @throws Exception\ResolveColumnNotHandle
+     * @throws Exception\WhereColumnNotHandle
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
     public function get(
         array $filtres,
         int $index,
         string $direction,
         int $start
     ): array {
-        $this->createFoundationQuery($filtres);
+        $query = $this->createQueryResult();
+        $this->createFoundationQuery($query, $filtres);
         $data = $this->result($index, $direction, $start);
 
         return array(

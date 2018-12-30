@@ -90,19 +90,16 @@ class Column
      */
     private function setParameter(QueryBuilder &$query, string $data): void
     {
-        if (\is_string($this->resolve)) {
-            $query->setParameter(
-                $this->alias,
-                str_replace(':'.$this->alias, $data, $this->resolve)
-            );
-        } elseif (\is_callable($this->resolve)) {
-            $query->setParameter(
-                $this->alias,
-                \call_user_func($this->resolve, $data)
-            );
-        } else {
+        if (!\is_string($this->resolve) && !\is_callable($this->resolve)) {
             throw new ResolveColumnNotHandle();
         }
+
+        $query->setParameter(
+            $this->alias,
+            \is_string($this->resolve) ?
+                str_replace(':'.$this->alias, $data, $this->resolve) :
+                \call_user_func($this->resolve, $data)
+        );
     }
 
     /**
@@ -120,11 +117,11 @@ class Column
      */
     public function where(QueryBuilder &$query, $data): void
     {
-        if (\is_string($this->where) || $this->where instanceof Expr) {
-            $query->andWhere($this->where);
-        } else {
+        if (!\is_string($this->where) && !$this->where instanceof Expr) {
             throw new WhereColumnNotHandle();
         }
+
+        $query->andWhere($this->where);
 
         $this->setParameter($query, $data);
     }

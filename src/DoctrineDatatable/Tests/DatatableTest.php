@@ -14,6 +14,7 @@ class DatatableTest extends OrmFunctionalTestCase
      */
     private $datatable;
 
+
     /**
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\ORMException

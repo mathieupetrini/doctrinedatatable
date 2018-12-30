@@ -19,7 +19,8 @@
 
     <testsuites>
         <testsuite name="Global Test Suite">
-            <directory>./src/DoctrineDatatable/*/Tests/</directory>
+            <directory>./src/DoctrineDatatable/**/Tests/</directory>
+            <directory>./src/DoctrineDatatable/Tests/</directory>
         </testsuite>
     </testsuites>
 

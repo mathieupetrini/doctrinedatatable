@@ -136,15 +136,21 @@ class Datatable
     }
 
     /**
-     * PUBLIC METHODS.
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param int $index
+     * @param string $direction
+     * @param int $start
+     *
+     * @return array
      */
-    public function result(
+    private function result(
+        QueryBuilder &$query,
         int $index,
         string $direction,
         int $start
     ): array {
-        $query = $this->createQueryResult();
-
         $this->orderBy($query, $index, $direction)
             ->limit($query, $start);
 
@@ -159,7 +165,7 @@ class Datatable
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function count(): int
+    private function count(): int
     {
         $query = clone $this->query;
 
@@ -167,6 +173,10 @@ class Datatable
             ->getQuery()
             ->getSingleScalarResult());
     }
+
+    /**
+     * PUBLIC METHODS.
+     */
 
     /**
      * @param array  $filtres
@@ -188,7 +198,7 @@ class Datatable
     ): array {
         $query = $this->createQueryResult();
         $this->createFoundationQuery($query, $filtres);
-        $data = $this->result($index, $direction, $start);
+        $data = $this->result($query, $index, $direction, $start);
 
         return array(
             'recordsTotal' => $this->count(),

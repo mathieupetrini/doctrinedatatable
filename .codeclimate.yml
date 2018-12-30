@@ -19,6 +19,6 @@ plugins:
       rulesets: "cleancode,codesize,unusedcode,controversial,design,naming"
 exclude_patterns:
   - ".bundle/"
-  - "node_modules/*"
-  - "vendor/*"
+  - "**/node_modules/*"
+  - "**/vendor/"
   - "**/*.js"

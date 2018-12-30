@@ -49,18 +49,6 @@ services:
     - php -r "unlink('composer-setup.php'); unlink('installer.sig');"
     - php composer.phar install
 
-danger:
-  stage: prepare
-  script:
-    - rvm --default use 2.3
-    - bundle install --path vendor/bundle
-    - bundle exec danger --fail-on-errors=true
-  except:
-    - master
-  tags:
-    - ruby
-  allow_failure: true
-
 security_checker:
   <<: *php_script
   image: php:7.2
@@ -88,7 +76,7 @@ phpunit:
   stage: build
   script:
     - cp phpunit.xml.dist phpunit.xml
-    - ./vendor/bin/phpunit --coverage-text --configuration phpunit.xml
+    - ./vendor/bin/phpunit --coverage-text --colors=never --configuration phpunit.xml --testsuite "Global Test Suite"
   artifacts:
     paths:
       - tests/coverage/

@@ -3,6 +3,7 @@
 namespace DoctrineDatatable;
 
 use Doctrine\ORM\QueryBuilder;
+use DoctrineDatatable\Exception\MinimumColumn;
 
 class Datatable
 {
@@ -31,12 +32,27 @@ class Datatable
      */
     public const RESULT_PER_PAGE = 30;
 
+    /**
+     * Datatable constructor.
+     *
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param string       $identifier
+     * @param array        $columns
+     * @param int|null     $result_per_page
+     *
+     * @throws MinimumColumn
+     */
     public function __construct(
         QueryBuilder $query,
         string $identifier,
         array $columns,
         ?int $result_per_page = self::RESULT_PER_PAGE
     ) {
+        if (empty($columns)) {
+            throw new MinimumColumn();
+        }
         $this->query = $query;
         $this->identifier = $identifier;
         $this->columns = $columns;
@@ -56,11 +72,8 @@ class Datatable
     {
         $index = array_search(
             $alias,
-            // Aliases in an array
-            array_column(
-                $this->columns,
-                'alias',
-                'alias'
+            array_keys(
+                array_column($this->columns, 'alias', 'alias')
             )
         );
 
@@ -69,16 +82,27 @@ class Datatable
             null;
     }
 
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param array        $filtres
+     *
+     * @return QueryBuilder
+     *
+     * @throws Exception\ResolveColumnNotHandle
+     * @throws Exception\WhereColumnNotHandle
+     */
     private function createFoundationQuery(QueryBuilder &$query, array $filtres): QueryBuilder
     {
         foreach ($filtres as $alias => $filtre) {
-            if (!empty($filtre)) {
-                $column = $this->getColumnFromAlias($alias);
-                if ($column instanceof Column) {
-                    $column->where($query, $filtre);
-                }
+            $column = $this->getColumnFromAlias($alias);
+            if ($column instanceof Column && !empty($filtre)) {
+                $column->where($query, $filtre);
             }
         }
+
+        return $query;
     }
 
     /**
@@ -87,45 +111,64 @@ class Datatable
     private function createQueryResult(): QueryBuilder
     {
         $query = clone $this->query;
-        $query->select($this->identifier);
-        foreach ($this->columns as $alias => $column) {
-            $this->processColumnSelect($query, $alias, $column);
+        $query->select($this->processColumnIdentifier($query));
+        foreach ($this->columns as $column) {
+            $this->processColumnSelect($query, $column);
         }
 
         return $query;
     }
 
-    private function processColumnSelect(QueryBuilder &$query, string $alias, Column $column): void
+    private function processColumnIdentifier(QueryBuilder &$query): string
     {
-        $query->addSelect($column->getName().' AS '.$alias);
+        return $query->getRootAliases()[0].'.'.$this->identifier;
+    }
+
+    private function processColumnSelect(QueryBuilder &$query, Column $column): void
+    {
+        $query->addSelect($column->getName().' AS '.$column->getAlias());
     }
 
     private function orderBy(QueryBuilder &$query, int $index, string $direction): self
     {
         $query->orderBy(
-            \array_slice($this->columns, $index, 1)['alias'],
+            \array_slice($this->columns, $index, 1)[0]->getAlias(),
             $direction
         );
 
         return $this;
     }
 
+    /**
+     * @param QueryBuilder $query
+     * @param int          $start
+     *
+     * @return Datatable
+     */
     private function limit(QueryBuilder &$query, int $start): self
     {
         $query->setFirstResult($start)
             ->setMaxResults($this->result_per_page);
+
+        return $this;
     }
 
     /**
-     * PUBLIC METHODS.
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param int          $index
+     * @param string       $direction
+     * @param int          $start
+     *
+     * @return array
      */
-    public function result(
+    private function result(
+        QueryBuilder &$query,
         int $index,
         string $direction,
         int $start
     ): array {
-        $query = $this->createQueryResult();
-
         $this->orderBy($query, $index, $direction)
             ->limit($query, $start);
 
@@ -133,26 +176,54 @@ class Datatable
             ->getResult();
     }
 
-    public function count(): int
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     *
+     * @return int
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    private function count(QueryBuilder $query): int
     {
-        $query = clone $this->query;
+        $query = clone $query;
 
-        return (int) ($query->select('COUNT(DISTINCT '.$this->identifier.')')
+        return (int) ($query->select('COUNT(DISTINCT '.$this->processColumnIdentifier($query).')')
+            ->resetDQLPart('orderBy')
             ->getQuery()
             ->getSingleScalarResult());
     }
 
+    /**
+     * PUBLIC METHODS.
+     */
+
+    /**
+     * @param array  $filtres
+     * @param int    $index
+     * @param string $direction
+     * @param int    $start
+     *
+     * @return array
+     *
+     * @throws Exception\ResolveColumnNotHandle
+     * @throws Exception\WhereColumnNotHandle
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
     public function get(
         array $filtres,
         int $index,
         string $direction,
         int $start
     ): array {
-        $this->createFoundationQuery($filtres);
-        $data = $this->result($index, $direction, $start);
+        $query = $this->createQueryResult();
+        $this->createFoundationQuery($query, $filtres);
+
+        $data = $this->result($query, $index, $direction, $start);
 
         return array(
-            'recordsTotal' => $this->count(),
+            'recordsTotal' => $this->count($query),
             'recordsFiltered' => \count($data),
             'data' => $data,
         );

@@ -51,6 +51,7 @@ services:
 
 danger:
   stage: prepare
+  image: ruby:2.6
   script:
     - apt-get update -qy
     - apt-get install -y nodejs

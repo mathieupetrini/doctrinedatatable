@@ -115,7 +115,7 @@ class ColumnTest extends OrmTestCase
      */
     public function testWhereWithNotResolvedColumnType(): void
     {
-        $this->setExpectedException(\DoctrineDatatable\Exception\ResolveColumnNotHandle::class);
+        $this->expectException(\DoctrineDatatable\Exception\ResolveColumnNotHandle::class);
 
         $column = new Column(
             'firstname',
@@ -137,7 +137,7 @@ class ColumnTest extends OrmTestCase
      */
     public function testWhereWithNotResolvedWhereType(): void
     {
-        $this->setExpectedException(\DoctrineDatatable\Exception\WhereColumnNotHandle::class);
+        $this->expectException(\DoctrineDatatable\Exception\WhereColumnNotHandle::class);
 
         $column = new Column(
             'firstname',

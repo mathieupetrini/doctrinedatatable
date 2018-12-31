@@ -5,10 +5,11 @@
     "type": "library",
     "require": {
         "php": "^7.1",
-        "doctrine/orm": "^2.6"
+        "doctrine/dbal": "^2.4",
+        "doctrine/orm": "^2.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.0",
+        "phpunit/phpunit": "^7.0",
         "friendsofphp/php-cs-fixer": "^2.14@dev",
         "pheromone/phpcs-security-audit": "dev-master",
         "sensiolabs/security-checker": "^5.0@dev"
@@ -28,5 +29,5 @@
             "**/Tests/"
         ]
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable"
 }

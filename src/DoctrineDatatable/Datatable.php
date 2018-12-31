@@ -25,7 +25,17 @@ class Datatable
     /**
      * @var int
      */
-    private $result_per_page;
+    private $resultPerPage;
+
+    /**
+     * @var string
+     */
+    private $nameIdentifier;
+
+    /**
+     * @var string
+     */
+    private const DEFAULT_NAME_IDENTIFIER = 'DT_RowID';
 
     /**
      * @var int
@@ -40,7 +50,7 @@ class Datatable
      * @param QueryBuilder $query
      * @param string       $identifier
      * @param array        $columns
-     * @param int|null     $result_per_page
+     * @param int|null     $resultPerPage
      *
      * @throws MinimumColumn
      */
@@ -48,7 +58,7 @@ class Datatable
         QueryBuilder $query,
         string $identifier,
         array $columns,
-        ?int $result_per_page = self::RESULT_PER_PAGE
+        ?int $resultPerPage = self::RESULT_PER_PAGE
     ) {
         if (empty($columns)) {
             throw new MinimumColumn();
@@ -56,7 +66,8 @@ class Datatable
         $this->query = $query;
         $this->identifier = $identifier;
         $this->columns = $columns;
-        $this->result_per_page = $result_per_page ?? self::RESULT_PER_PAGE;
+        $this->resultPerPage = $resultPerPage ?? self::RESULT_PER_PAGE;
+        $this->nameIdentifier = self::DEFAULT_NAME_IDENTIFIER;
     }
 
     /**
@@ -119,16 +130,38 @@ class Datatable
         return $query;
     }
 
-    private function processColumnIdentifier(QueryBuilder &$query): string
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     *
+     * @return string
+     */
+    private function processColumnIdentifier(QueryBuilder &$query, bool $withAlias = true): string
     {
-        return $query->getRootAliases()[0].'.'.$this->identifier;
+        return $query->getRootAliases()[0].'.'.$this->identifier.($withAlias ? ' AS '.$this->nameIdentifier : '');
     }
 
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param Column       $column
+     */
     private function processColumnSelect(QueryBuilder &$query, Column $column): void
     {
         $query->addSelect($column->getName().' AS '.$column->getAlias());
     }
 
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param int          $index
+     * @param string       $direction
+     *
+     * @return Datatable
+     */
     private function orderBy(QueryBuilder &$query, int $index, string $direction): self
     {
         $query->orderBy(
@@ -148,7 +181,7 @@ class Datatable
     private function limit(QueryBuilder &$query, int $start): self
     {
         $query->setFirstResult($start)
-            ->setMaxResults($this->result_per_page);
+            ->setMaxResults($this->resultPerPage);
 
         return $this;
     }
@@ -189,10 +222,24 @@ class Datatable
     {
         $query = clone $query;
 
-        return (int) ($query->select('COUNT(DISTINCT '.$this->processColumnIdentifier($query).')')
+        return (int) ($query->select('COUNT(DISTINCT '.$this->processColumnIdentifier($query, false).')')
             ->resetDQLPart('orderBy')
             ->getQuery()
             ->getSingleScalarResult());
+    }
+
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @return array
+     */
+    private function columns(): array
+    {
+        return array_map(static function (Column $column) {
+            return array(
+                'data' => $column->getAlias(),
+            );
+        }, $this->columns);
     }
 
     /**
@@ -200,10 +247,13 @@ class Datatable
      */
 
     /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
      * @param array  $filtres
-     * @param int    $index     (optional) (default=0)
-     * @param string $direction (optional) (default='ASC')
-     * @param int    $start     (optional) (default=0)
+     * @param int    $index       (optional) (default=0)
+     * @param string $direction   (optional) (default='ASC')
+     * @param int    $start       (optional) (default=0)
+     * @param bool   $withColumns (optional) (default=false)
      *
      * @return array
      *
@@ -215,17 +265,48 @@ class Datatable
         array $filtres,
         int $index = 0,
         string $direction = 'ASC',
-        int $start = 0
+        int $start = 0,
+        bool $withColumns = false
     ): array {
         $query = $this->createQueryResult();
         $this->createFoundationQuery($query, $filtres);
 
         $data = $this->result($query, $index, $direction, $start);
 
-        return array(
+        $ret = array(
             'recordsTotal' => $this->count($query),
             'recordsFiltered' => \count($data),
             'data' => $data,
         );
+
+        if ($withColumns) {
+            $ret['columns'] = $this->columns();
+        }
+
+        return $ret;
+    }
+
+    /**
+     * GETTERS / SETTERS.
+     */
+
+    /**
+     * @return string
+     */
+    public function getNameIdentifier(): string
+    {
+        return $this->nameIdentifier;
+    }
+
+    /**
+     * @param string $nameIdentifier
+     *
+     * @return Datatable
+     */
+    public function setNameIdentifier(string $nameIdentifier): self
+    {
+        $this->nameIdentifier = $nameIdentifier;
+
+        return $this;
     }
 }

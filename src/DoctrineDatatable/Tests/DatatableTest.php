@@ -90,6 +90,22 @@ class DatatableTest extends OrmFunctionalTestCase
     }
 
     /**
+     * @throws \DoctrineDatatable\Exception\MinimumColumn
+     */
+    public function testNewDatatableWithoutColumns(): void
+    {
+        $this->expectException(\DoctrineDatatable\Exception\MinimumColumn::class);
+
+        new Datatable(
+            $this->_em->createQueryBuilder()
+                ->select('u')
+                ->from(CmsUser::class, 'u'),
+            'id',
+            array()
+        );
+    }
+
+    /**
      * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
      * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
      * @throws \Doctrine\ORM\NonUniqueResultException
@@ -138,12 +154,20 @@ class DatatableTest extends OrmFunctionalTestCase
             ),
             0,
             'ASC',
-            0
+            0,
+            true
         );
 
         $this->assertEquals(1, $result['recordsTotal']);
         $this->assertEquals(1, $result['recordsFiltered']);
         $this->assertCount(1, $result['data']);
+        $this->assertEquals(
+            array(
+                array('data' => 'name'),
+                array('data' => 'status'),
+            ),
+            $result['columns']
+        );
     }
 
     /**
@@ -165,5 +189,12 @@ class DatatableTest extends OrmFunctionalTestCase
         $this->assertEquals(4, $result['recordsTotal']);
         $this->assertEquals(4, $result['recordsFiltered']);
         $this->assertCount(4, $result['data']);
+    }
+
+    public function testSetNameIdentifier(): void
+    {
+        $this->datatable->setNameIdentifier('ROW_ID');
+
+        $this->assertEquals('ROW_ID', $this->datatable->getNameIdentifier());
     }
 }

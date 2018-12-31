@@ -109,6 +109,50 @@ class ColumnTest extends OrmTestCase
         );
     }
 
+    /**
+     * @expectedException \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     *
+     * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
+     */
+    public function testWhereWithNotResolvedColumnType(): void
+    {
+        $column = new Column(
+            'firstname',
+            'e.firstname',
+            'e.firstname = :firstname',
+            10
+        );
+
+        $query = $this->entityManager->createQueryBuilder()
+            ->select('u')
+            ->from(User::class, 'u');
+
+        $column->where($query,10);
+    }
+
+    /**
+     * @expectedException \DoctrineDatatable\Exception\WhereColumnNotHandle
+     *
+     * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
+     */
+    public function testWhereWithNotResolvedWhereType(): void
+    {
+        $column = new Column(
+            'firstname',
+            'e.firstname',
+            10,
+            ':firstname'
+        );
+
+        $query = $this->entityManager->createQueryBuilder()
+            ->select('u')
+            ->from(User::class, 'u');
+
+        $column->where($query,10);
+    }
+
     public static function setUpBeforeClass(): void
     {
         self::$column = new Column(

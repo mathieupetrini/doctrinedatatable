@@ -8,8 +8,7 @@ use DoctrineDatatable\Column;
 use DoctrineDatatable\Datatable;
 
 /**
- * Class DatatableTest
- * @package DoctrineDatatable\Tests
+ * Class DatatableTest.
  *
  * @codeCoverageIgnore
  */

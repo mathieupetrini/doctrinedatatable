@@ -110,13 +110,13 @@ class ColumnTest extends OrmTestCase
     }
 
     /**
-     * @expectedException \DoctrineDatatable\Exception\ResolveColumnNotHandle
-     *
      * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
      * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
      */
     public function testWhereWithNotResolvedColumnType(): void
     {
+        $this->setExpectedException(\DoctrineDatatable\Exception\ResolveColumnNotHandle::class);
+
         $column = new Column(
             'firstname',
             'e.firstname',
@@ -128,17 +128,17 @@ class ColumnTest extends OrmTestCase
             ->select('u')
             ->from(User::class, 'u');
 
-        $column->where($query,10);
+        $column->where($query, 10);
     }
 
     /**
-     * @expectedException \DoctrineDatatable\Exception\WhereColumnNotHandle
-     *
      * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
      * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
      */
     public function testWhereWithNotResolvedWhereType(): void
     {
+        $this->setExpectedException(\DoctrineDatatable\Exception\WhereColumnNotHandle::class);
+
         $column = new Column(
             'firstname',
             'e.firstname',
@@ -150,7 +150,7 @@ class ColumnTest extends OrmTestCase
             ->select('u')
             ->from(User::class, 'u');
 
-        $column->where($query,10);
+        $column->where($query, 10);
     }
 
     public static function setUpBeforeClass(): void

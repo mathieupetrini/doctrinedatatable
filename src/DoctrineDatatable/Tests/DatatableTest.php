@@ -90,12 +90,12 @@ class DatatableTest extends OrmFunctionalTestCase
     }
 
     /**
-     * @expectedException \DoctrineDatatable\Exception\MinimumColumn
-     *
      * @throws \DoctrineDatatable\Exception\MinimumColumn
      */
     public function testNewDatatableWithoutColumns(): void
     {
+        $this->setExpectedException(\DoctrineDatatable\Exception\MinimumColumn::class);
+
         new Datatable(
             $this->_em->createQueryBuilder()
                 ->select('u')

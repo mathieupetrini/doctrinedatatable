@@ -107,6 +107,7 @@ class DatatableTest extends OrmFunctionalTestCase
 
     /**
      * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\UnfilterableColumn
      * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -143,6 +144,7 @@ class DatatableTest extends OrmFunctionalTestCase
 
     /**
      * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\UnfilterableColumn
      * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -150,11 +152,16 @@ class DatatableTest extends OrmFunctionalTestCase
     {
         $result = $this->datatable->get(
             array(
-                'name' => 'name1',
+                'columns' => array(
+                    array(
+                        'search' => array(
+                            'value' => 'name1',
+                        ),
+                    ),
+                ),
             ),
             0,
             'ASC',
-            0,
             true
         );
 
@@ -172,6 +179,7 @@ class DatatableTest extends OrmFunctionalTestCase
 
     /**
      * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\UnfilterableColumn
      * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -182,8 +190,7 @@ class DatatableTest extends OrmFunctionalTestCase
                 'undefined' => 'name1',
             ),
             0,
-            'ASC',
-            0
+            'ASC'
         );
 
         $this->assertEquals(4, $result['recordsTotal']);
@@ -196,5 +203,29 @@ class DatatableTest extends OrmFunctionalTestCase
         $this->datatable->setNameIdentifier('ROW_ID');
 
         $this->assertEquals('ROW_ID', $this->datatable->getNameIdentifier());
+    }
+
+    /**
+     * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\UnfilterableColumn
+     * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function testSetGlobalSearch(): void
+    {
+        $result = (clone $this->datatable)->setGlobalSearch(true)
+            ->get(
+                array(
+                    'search' => array(
+                        'value' => 'name1',
+                    ),
+                ),
+                0,
+                'ASC'
+            );
+
+        $this->assertEquals(1, $result['recordsTotal']);
+        $this->assertEquals(1, $result['recordsFiltered']);
+        $this->assertCount(1, $result['data']);
     }
 }

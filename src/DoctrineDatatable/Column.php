@@ -35,6 +35,8 @@ class Column
      */
     private $resolve;
 
+    public const GLOBAL_ALIAS = 'value';
+
     /**
      * Column constructor.
      *
@@ -51,30 +53,6 @@ class Column
         $this->name = $name;
         $this->where = $where;
         $this->resolve = $resolve;
-    }
-
-    /**
-     * MAGIC METHODS.
-     */
-
-    /**
-     * @param string $prop
-     *
-     * @return mixed
-     */
-    public function __get(string $prop)
-    {
-        return $this->$prop;
-    }
-
-    /**
-     * @param string $prop
-     *
-     * @return bool
-     */
-    public function __isset(string $prop): bool
-    {
-        return isset($this->$prop);
     }
 
     /**
@@ -113,11 +91,13 @@ class Column
      * @param QueryBuilder $query
      * @param mixed        $data
      *
+     * @return string
+     *
      * @throws ResolveColumnNotHandle
      * @throws WhereColumnNotHandle
      * @throws UnfilterableColumn
      */
-    public function where(QueryBuilder &$query, $data): void
+    public function where(QueryBuilder &$query, $data): string
     {
         if (null === $this->where) {
             throw new UnfilterableColumn();
@@ -125,9 +105,9 @@ class Column
             throw new WhereColumnNotHandle();
         }
 
-        $query->andWhere($this->where);
-
         $this->setParameter($query, $data);
+
+        return (string) $this->where;
     }
 
     /**

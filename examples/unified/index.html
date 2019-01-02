@@ -1,0 +1,44 @@
+<html lang="en">
+<head>
+    <title>DoctrineDatatable Unified</title>
+    <script src="./../../node_modules/jquery/dist/jquery.js"></script>
+    <script src="./../../node_modules/datatables.net/js/jquery.dataTables.js"></script>
+    <script src="./../../node_modules/datatables.net-bs4/js/dataTables.bootstrap4.js"></script>
+    <link rel="stylesheet" media="screen" href="./../../node_modules/bootstrap/dist/css/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" media="screen" href="./../../node_modules/datatables.net-bs4/css/dataTables.bootstrap4.css" type="text/css" />
+</head>
+<body>
+    <table id="example" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Status
+                </th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</body>
+</html>
+
+<script>
+    $('#example').dataTable({
+        ajax: {
+            url: './ajax.php',
+            data: function(refine) {
+                return refine;
+            },
+            type: 'POST'
+        },
+        columns: [
+            {data: 'name'},
+            {data: 'status'}
+        ],
+        order: [[0, 'asc']],
+        pageLength: 30,
+        serverSide: true
+    });
+</script>

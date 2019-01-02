@@ -121,6 +121,35 @@ class Datatable
      * @param QueryBuilder $query
      * @param array        $filters
      *
+     * @return string
+     *
+     * @throws Exception\ResolveColumnNotHandle
+     * @throws Exception\UnfilterableColumn
+     * @throws Exception\WhereColumnNotHandle
+     */
+    private function createWherePart(QueryBuilder &$query, array $filters): string
+    {
+        $expr = new Expr();
+        $temp = '';
+
+        foreach ($filters as $alias => $filtre) {
+            $column = $this->getColumnFromAlias($alias);
+            if ($column instanceof Column && !empty($filtre)) {
+                $temp .= $this->globalSearch ?
+                    (!empty($temp) ? ' OR ' : '').$expr->orX($column->where($query, $filtre)) :
+                    $expr->andX($column->where($query, $filtre));
+            }
+        }
+
+        return $temp;
+    }
+
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param array        $filters
+     *
      * @return QueryBuilder
      *
      * @throws Exception\ResolveColumnNotHandle
@@ -134,17 +163,7 @@ class Datatable
             $filters = $this->createGlobalFilters($filters);
         }
 
-        $expr = new Expr();
-        $temp = '';
-
-        foreach ($filters as $alias => $filtre) {
-            $column = $this->getColumnFromAlias($alias);
-            if ($column instanceof Column && !empty($filtre)) {
-                $temp .= $this->globalSearch ?
-                    (!empty($temp) ? ' OR ' : '').$expr->orX($column->where($query, $filtre)) :
-                    $expr->andX($column->where($query, $filtre));
-            }
-        }
+        $temp = $this->createWherePart($query, $filters);
 
         return !empty($temp) ?
             $query->andWhere($temp) :

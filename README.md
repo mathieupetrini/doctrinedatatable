@@ -12,7 +12,6 @@
 Deeply based on Doctrine2 package and jQueryDatatable. DoctrineDatatable attempts to take the pain out of development of 
 datatable inside yours Web Application.
 
-
 ## Requirements
 
 DoctrineDatatable requires : 

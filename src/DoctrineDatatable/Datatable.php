@@ -108,11 +108,18 @@ class Datatable
      */
     private function createGlobalFilters(array $filters): array
     {
-        array_map(function (Column $column) use (&$filters) {
-            $filters[$column->getAlias()] = $filters['search'][Column::GLOBAL_ALIAS];
+        $temp = array(
+            'columns' => array(),
+        );
+        array_map(function (Column $column) use ($filters, &$temp) {
+            $temp['columns'][] = array(
+                'search' => array(
+                    'value' => $filters['search'][Column::GLOBAL_ALIAS],
+                ),
+            );
         }, $this->columns);
 
-        return $filters;
+        return $temp;
     }
 
     /**
@@ -132,7 +139,9 @@ class Datatable
         $expr = new Expr();
         $temp = '';
 
-        foreach ($filters['columns'] as $index => $filter) {
+        $filt = isset($filters['columns']) ? $filters['columns'] : array();
+
+        foreach ($filt as $index => $filter) {
             $column = isset($this->columns[$index]) ? $this->columns[$index] : null;
             if ($column instanceof Column && !empty($filter['search']['value'])) {
                 $temp .= $this->globalSearch ?

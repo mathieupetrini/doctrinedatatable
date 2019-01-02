@@ -152,7 +152,13 @@ class DatatableTest extends OrmFunctionalTestCase
     {
         $result = $this->datatable->get(
             array(
-                'name' => 'name1',
+                'columns' => array(
+                    array(
+                        'search' => array(
+                            'value' => 'name1',
+                        ),
+                    ),
+                ),
             ),
             0,
             'ASC',

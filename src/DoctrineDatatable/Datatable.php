@@ -81,25 +81,6 @@ class Datatable
      */
 
     /**
-     * @param string $alias
-     *
-     * @return Column|null
-     */
-    private function getColumnFromAlias(string $alias): ?Column
-    {
-        $index = array_search(
-            $alias,
-            array_keys(
-                array_column($this->columns, 'alias', 'alias')
-            )
-        );
-
-        return false !== $index ?
-            $this->columns[$index] :
-            null;
-    }
-
-    /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
      * @param array $filters

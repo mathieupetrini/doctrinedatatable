@@ -56,30 +56,6 @@ class Column
     }
 
     /**
-     * MAGIC METHODS.
-     */
-
-    /**
-     * @param string $prop
-     *
-     * @return mixed
-     */
-    public function __get(string $prop)
-    {
-        return $this->$prop;
-    }
-
-    /**
-     * @param string $prop
-     *
-     * @return bool
-     */
-    public function __isset(string $prop): bool
-    {
-        return isset($this->$prop);
-    }
-
-    /**
      * PRIVATE METHODS.
      */
 

@@ -7,8 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use DoctrineDatatable\Exception\MinimumColumn;
 
 /**
- * Class Datatable
- * @package DoctrineDatatable
+ * Class Datatable.
  *
  * @author Mathieu Petrini <mathieupetrini@gmail.com>
  */
@@ -57,7 +56,7 @@ class Datatable
      * @param string       $identifier
      * @param array        $columns
      * @param int|null     $resultPerPage
-     * @param bool         $globalSearch (optional) (default=false)
+     * @param bool         $globalSearch  (optional) (default=false)
      *
      * @throws MinimumColumn
      */
@@ -118,7 +117,7 @@ class Datatable
     {
         // If global search we erase all specific where and only keep the unified filter
         if ($this->globalSearch && !empty($filtres[Column::GLOBAL_ALIAS])) {
-            array_map(function (Column $column) use(&$filtres) {
+            array_map(function (Column $column) use (&$filtres) {
                 $filtres[$column->getAlias()] = $filtres[Column::GLOBAL_ALIAS];
             }, $this->columns);
         }
@@ -343,6 +342,7 @@ class Datatable
     public function setGlobalSearch(bool $globalSearch): self
     {
         $this->globalSearch = $globalSearch;
+
         return $this;
     }
 }

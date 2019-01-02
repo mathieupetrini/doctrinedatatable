@@ -5,6 +5,7 @@ namespace DoctrineDatatable;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use DoctrineDatatable\Exception\ResolveColumnNotHandle;
+use DoctrineDatatable\Exception\UnfilterableColumn;
 use DoctrineDatatable\Exception\WhereColumnNotHandle;
 
 /**
@@ -25,12 +26,12 @@ class Column
     private $name;
 
     /**
-     * @var string|Expr
+     * @var string|Expr|null
      */
     private $where;
 
     /**
-     * @var string|callable
+     * @var string|callable|null
      */
     private $resolve;
 
@@ -39,12 +40,12 @@ class Column
      *
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param string $alias
-     * @param string $name
-     * @param mixed  $where   (string, \Doctrine\ORM\Query\Expr)
-     * @param mixed  $resolve (string, callable)
+     * @param string     $alias
+     * @param string     $name
+     * @param mixed|null $where   (string, \Doctrine\ORM\Query\Expr)
+     * @param mixed|null $resolve (string, callable)
      */
-    public function __construct(string $alias, string $name, $where, $resolve)
+    public function __construct(string $alias, string $name, $where = '', $resolve = '')
     {
         $this->alias = $alias;
         $this->name = $name;
@@ -114,10 +115,13 @@ class Column
      *
      * @throws ResolveColumnNotHandle
      * @throws WhereColumnNotHandle
+     * @throws UnfilterableColumn
      */
     public function where(QueryBuilder &$query, $data): void
     {
-        if (!\is_string($this->where) && !$this->where instanceof Expr) {
+        if (null === $this->where) {
+            throw new UnfilterableColumn();
+        } elseif (!\is_string($this->where) && !$this->where instanceof Expr) {
             throw new WhereColumnNotHandle();
         }
 

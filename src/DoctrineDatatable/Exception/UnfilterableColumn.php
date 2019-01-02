@@ -3,16 +3,16 @@
 namespace DoctrineDatatable\Exception;
 
 /**
- * Class MinimumColumn.
+ * Class UnfilterableColumn.
  *
  * @author Mathieu Petrini <mathieupetrini@gmail.com>
  *
  * @codeCoverageIgnore
  */
-class MinimumColumn extends \Exception
+class UnfilterableColumn extends \Exception
 {
     /**
-     * MinimumColumn constructor.
+     * UnfilterableColumn constructor.
      *
      * @param int             $code
      * @param \Throwable|null $previous
@@ -20,7 +20,7 @@ class MinimumColumn extends \Exception
     public function __construct($code = 0, \Throwable $previous = null)
     {
         parent::__construct(
-            'At least one column is mandatory to initialize a datatable',
+            'This column cannot be filtered.',
             $code,
             $previous
         );

@@ -72,7 +72,7 @@ phpcs_security_audit:
   <<: *php_script
   image: php:7.2
   script:
-    - ./vendor/bin/phpcs --extensions=php --standard=./.php_cs_audit.xml ./src/
+    - ./vendor/bin/phpcs --extensions=php --standard=./.php_cs.xml ./src/
   stage: security
 
 php_lint:

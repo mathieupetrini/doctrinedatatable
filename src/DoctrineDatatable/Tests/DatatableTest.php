@@ -210,7 +210,9 @@ class DatatableTest extends OrmFunctionalTestCase
         $result = (clone $this->datatable)->setGlobalSearch(true)
             ->get(
                 array(
-                    'global' => 'name1',
+                    'search' => array(
+                        'value' => 'name1',
+                    )
                 ),
                 0,
                 'ASC'

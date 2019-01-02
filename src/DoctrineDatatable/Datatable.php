@@ -109,7 +109,7 @@ class Datatable
     private function createGlobalFilters(array $filters): array
     {
         array_map(function (Column $column) use (&$filters) {
-            $filters[$column->getAlias()] = $filters[Column::GLOBAL_ALIAS];
+            $filters[$column->getAlias()] = $filters['search'][Column::GLOBAL_ALIAS];
         }, $this->columns);
 
         return $filters;
@@ -159,7 +159,7 @@ class Datatable
     private function createFoundationQuery(QueryBuilder &$query, array $filters): QueryBuilder
     {
         // If global search we erase all specific where and only keep the unified filter
-        if ($this->globalSearch && !empty($filters[Column::GLOBAL_ALIAS])) {
+        if ($this->globalSearch && isset($filters['search']) && !empty($filters['search'][Column::GLOBAL_ALIAS])) {
             $filters = $this->createGlobalFilters($filters);
         }
 
@@ -230,13 +230,14 @@ class Datatable
     /**
      * @param QueryBuilder $query
      * @param int          $start
+     * @param int|null     $length
      *
      * @return Datatable
      */
-    private function limit(QueryBuilder &$query, int $start): self
+    private function limit(QueryBuilder &$query, int $start, int $length = null): self
     {
         $query->setFirstResult($start)
-            ->setMaxResults($this->resultPerPage);
+            ->setMaxResults($length ?? $this->resultPerPage);
 
         return $this;
     }
@@ -247,18 +248,15 @@ class Datatable
      * @param QueryBuilder $query
      * @param int          $index
      * @param string       $direction
-     * @param int          $start
      *
      * @return array
      */
     private function result(
         QueryBuilder &$query,
         int $index,
-        string $direction,
-        int $start
+        string $direction
     ): array {
-        $this->orderBy($query, $index, $direction)
-            ->limit($query, $start);
+        $this->orderBy($query, $index, $direction);
 
         return $query->getQuery()
             ->getResult();
@@ -325,7 +323,11 @@ class Datatable
         $query = $this->createQueryResult();
         $this->createFoundationQuery($query, $filters);
 
-        $data = $this->result($query, $index, $direction, isset($filters['start']) ? $filters['start'] : 0);
+        $data = $this->limit(
+            $query,
+            isset($filters['start']) ? $filters['start'] : 0,
+            isset($filters['length']) ? $filters['length'] : $this->resultPerPage
+        )->result($query, $index, $direction);
 
         $ret = array(
             'recordsTotal' => $this->count($query),

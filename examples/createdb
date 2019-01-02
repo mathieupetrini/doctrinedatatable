@@ -1,0 +1,45 @@
+#!/usr/bin/env php
+<?php
+#!/usr/bin/php
+
+require __DIR__.'/../tests/autoload.php';
+
+$config = \Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration(
+    array(__DIR__.'./../vendor/doctrine/orm/tests/Doctrine/Tests/Models/CMS/'),
+    false,
+    __DIR__.'/cache/proxies/',
+    new \Doctrine\Common\Cache\ArrayCache(),
+    true
+);
+
+unlink(__DIR__.'/example.sqlite');
+
+$connectionParams = array(
+    'url' => 'sqlite:///'.__DIR__.'/example.sqlite',
+);
+
+$entityManager = \Doctrine\ORM\EntityManager::create(
+    \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config),
+    $config
+);
+
+$schemaTools = new \Doctrine\ORM\Tools\SchemaTool($entityManager);
+
+$schemaTools->createSchema(array(
+    $entityManager->getClassMetadata(\Doctrine\Tests\Models\CMS\CmsUser::class),
+    $entityManager->getClassMetadata(\Doctrine\Tests\Models\CMS\CmsPhonenumber::class),
+    $entityManager->getClassMetadata(\Doctrine\Tests\Models\CMS\CmsAddress::class),
+    $entityManager->getClassMetadata(\Doctrine\Tests\Models\CMS\CmsEmail::class),
+    $entityManager->getClassMetadata(\Doctrine\Tests\Models\CMS\CmsGroup::class),
+    $entityManager->getClassMetadata(\Doctrine\Tests\Models\CMS\CmsTag::class),
+    $entityManager->getClassMetadata(\Doctrine\Tests\Models\CMS\CmsArticle::class),
+    $entityManager->getClassMetadata(\Doctrine\Tests\Models\CMS\CmsComment::class)
+));
+
+$user1 = new \Doctrine\Tests\Models\CMS\CmsUser();
+$user1->status = 'st1';
+$user1->username = 'username1';
+$user1->name = 'name1';
+
+$entityManager->persist($user1);
+$entityManager->flush();

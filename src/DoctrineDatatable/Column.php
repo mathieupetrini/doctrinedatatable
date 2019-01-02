@@ -35,7 +35,7 @@ class Column
      */
     private $resolve;
 
-    public const GLOBAL_ALIAS = 'global';
+    public const GLOBAL_ALIAS = 'value';
 
     /**
      * Column constructor.

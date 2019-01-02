@@ -35,6 +35,8 @@ class Column
      */
     private $resolve;
 
+    public const GLOBAL_ALIAS = 'global';
+
     /**
      * Column constructor.
      *
@@ -113,11 +115,13 @@ class Column
      * @param QueryBuilder $query
      * @param mixed        $data
      *
+     * @return string
+     *
      * @throws ResolveColumnNotHandle
      * @throws WhereColumnNotHandle
      * @throws UnfilterableColumn
      */
-    public function where(QueryBuilder &$query, $data): void
+    public function where(QueryBuilder &$query, $data): string
     {
         if (null === $this->where) {
             throw new UnfilterableColumn();
@@ -125,9 +129,9 @@ class Column
             throw new WhereColumnNotHandle();
         }
 
-        $query->andWhere($this->where);
-
         $this->setParameter($query, $data);
+
+        return (string) $this->where;
     }
 
     /**

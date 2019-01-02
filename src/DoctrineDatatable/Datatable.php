@@ -2,9 +2,16 @@
 
 namespace DoctrineDatatable;
 
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use DoctrineDatatable\Exception\MinimumColumn;
 
+/**
+ * Class Datatable
+ * @package DoctrineDatatable
+ *
+ * @author Mathieu Petrini <mathieupetrini@gmail.com>
+ */
 class Datatable
 {
     /**
@@ -33,13 +40,12 @@ class Datatable
     private $nameIdentifier;
 
     /**
-     * @var string
+     * @var bool
      */
+    private $globalSearch;
+
     private const DEFAULT_NAME_IDENTIFIER = 'DT_RowID';
 
-    /**
-     * @var int
-     */
     public const RESULT_PER_PAGE = 30;
 
     /**
@@ -51,6 +57,7 @@ class Datatable
      * @param string       $identifier
      * @param array        $columns
      * @param int|null     $resultPerPage
+     * @param bool         $globalSearch (optional) (default=false)
      *
      * @throws MinimumColumn
      */
@@ -58,7 +65,8 @@ class Datatable
         QueryBuilder $query,
         string $identifier,
         array $columns,
-        ?int $resultPerPage = self::RESULT_PER_PAGE
+        ?int $resultPerPage = self::RESULT_PER_PAGE,
+        bool $globalSearch = false
     ) {
         if (empty($columns)) {
             throw new MinimumColumn();
@@ -68,6 +76,7 @@ class Datatable
         $this->columns = $columns;
         $this->resultPerPage = $resultPerPage ?? self::RESULT_PER_PAGE;
         $this->nameIdentifier = self::DEFAULT_NAME_IDENTIFIER;
+        $this->globalSearch = $globalSearch;
     }
 
     /**
@@ -107,14 +116,28 @@ class Datatable
      */
     private function createFoundationQuery(QueryBuilder &$query, array $filtres): QueryBuilder
     {
+        // If global search we erase all specific where and only keep the unified filter
+        if ($this->globalSearch && !empty($filtres[Column::GLOBAL_ALIAS])) {
+            array_map(function (Column $column) use(&$filtres) {
+                $filtres[$column->getAlias()] = $filtres[Column::GLOBAL_ALIAS];
+            }, $this->columns);
+        }
+
+        $expr = new Expr();
+        $temp = '';
+
         foreach ($filtres as $alias => $filtre) {
             $column = $this->getColumnFromAlias($alias);
             if ($column instanceof Column && !empty($filtre)) {
-                $column->where($query, $filtre);
+                $temp .= $this->globalSearch ?
+                    (!empty($temp) ? ' OR ' : '').$expr->orX($column->where($query, $filtre)) :
+                    $expr->andX($column->where($query, $filtre));
             }
         }
 
-        return $query;
+        return !empty($temp) ?
+            $query->andWhere($temp) :
+            $query;
     }
 
     /**
@@ -260,6 +283,7 @@ class Datatable
      * @return array
      *
      * @throws Exception\ResolveColumnNotHandle
+     * @throws Exception\UnfilterableColumn
      * @throws Exception\WhereColumnNotHandle
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -267,13 +291,12 @@ class Datatable
         array $filtres,
         int $index = 0,
         string $direction = 'ASC',
-        int $start = 0,
         bool $withColumns = false
     ): array {
         $query = $this->createQueryResult();
         $this->createFoundationQuery($query, $filtres);
 
-        $data = $this->result($query, $index, $direction, $start);
+        $data = $this->result($query, $index, $direction, isset($filtres['start']) ? $filtres['start'] : 0);
 
         $ret = array(
             'recordsTotal' => $this->count($query),
@@ -309,6 +332,17 @@ class Datatable
     {
         $this->nameIdentifier = $nameIdentifier;
 
+        return $this;
+    }
+
+    /**
+     * @param bool $globalSearch
+     *
+     * @return Datatable
+     */
+    public function setGlobalSearch(bool $globalSearch): self
+    {
+        $this->globalSearch = $globalSearch;
         return $this;
     }
 }

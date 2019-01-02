@@ -58,13 +58,14 @@ class ColumnTest extends OrmTestCase
             ->select('u')
             ->from(User::class, 'u');
 
-        self::$column->where(
+        $query->andWhere(self::$column->where(
             $query,
             10
-        );
+        ));
 
         $wherePart = $query->getDQLPart('where');
 
+        $this->assertNotNull($wherePart);
         $this->assertCount(1, $wherePart->getParts());
         $this->assertEquals(
             'e.firstname = :firstname',
@@ -90,13 +91,14 @@ class ColumnTest extends OrmTestCase
             ->select('u')
             ->from(User::class, 'u');
 
-        self::$columnWithResolveCallable->where(
+        $query->andWhere(self::$columnWithResolveCallable->where(
             $query,
             'N°10'
-        );
+        ));
 
         $wherePart = $query->getDQLPart('where');
 
+        $this->assertNotNull($wherePart);
         $this->assertCount(1, $wherePart->getParts());
         $this->assertEquals(
             'e.firstname = :firstname',

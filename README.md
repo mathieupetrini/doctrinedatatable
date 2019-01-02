@@ -30,6 +30,54 @@ composer require mpetrini/doctrinedatatable
 
 ### Basic Usage
 
+#### Unified Filter
+
+
+```php
+<?php
+
+use Doctrine\Tests\Models\CMS\CmsUser;
+use DoctrineDataTable\Column;
+use DoctrineDataTable\Datatable;
+
+$em = /** instanceof Doctrine\ORM\EntityManager */;
+
+$datatable = new Datatable(
+    $em->createQueryBuilder()
+        ->select('u')
+        ->from(CmsUser::class, 'u'),
+    // Primary key of your datatable (Primary key of your entity most of the time)
+    'id',
+    array(
+        new Column(
+            // alias
+            'name',
+            // attribute name with table alias
+            'u.name',
+            // Where part of the DQL
+            'u.name LIKE :global',
+            // EQ / GTE / GT / LT / LIKE ...
+            '%:global%'
+        ),
+        new Column(
+            'status',
+            'u.status',
+            // Where part of the DQL
+            'u.status LIKE :global',
+            // EQ / GTE / GT / LT / LIKE ...
+            '%:global%'
+        ),
+    )
+);
+
+echo json_encode(
+    $datatable->setGlobalSearch(true)
+        ->get($_GET)
+);
+```
+
+#### Filter by column
+
 ```php
 <?php
 
@@ -68,6 +116,10 @@ echo json_encode($datatable->get(
     $_GET
 ));
 ```
+
+## Example
+
+See <a href="https://gitlab.com/mpetrini/doctrinedatatable/blob/master/examples">examples</a> directory.
 
 ## License
 

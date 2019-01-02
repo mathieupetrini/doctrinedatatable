@@ -212,7 +212,7 @@ class DatatableTest extends OrmFunctionalTestCase
                 array(
                     'search' => array(
                         'value' => 'name1',
-                    )
+                    ),
                 ),
                 0,
                 'ASC'

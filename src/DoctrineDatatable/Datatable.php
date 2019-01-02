@@ -92,7 +92,7 @@ class Datatable
         $temp = array(
             'columns' => array(),
         );
-        array_map(function (Column $column) use ($filters, &$temp) {
+        array_map(function () use ($filters, &$temp) {
             $temp['columns'][] = array(
                 'search' => array(
                     'value' => $filters['search'][Column::GLOBAL_ALIAS],

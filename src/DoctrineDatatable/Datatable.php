@@ -102,6 +102,7 @@ class Datatable
      * @return QueryBuilder
      *
      * @throws Exception\ResolveColumnNotHandle
+     * @throws Exception\UnfilterableColumn
      * @throws Exception\WhereColumnNotHandle
      */
     private function createFoundationQuery(QueryBuilder &$query, array $filtres): QueryBuilder
@@ -134,6 +135,7 @@ class Datatable
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
      * @param QueryBuilder $query
+     * @param bool         $withAlias (optional) (default=true)
      *
      * @return string
      */

@@ -33,7 +33,9 @@ composer require mpetrini/doctrinedatatable
 ```php
 <?php
 
-use DoctrineDataTable;
+use Doctrine\Tests\Models\CMS\CmsUser;
+use DoctrineDataTable\Column;
+use DoctrineDataTable\Datatable;
 
 $em = /** instanceof Doctrine\ORM\EntityManager */;
 
@@ -62,7 +64,7 @@ $datatable = new Datatable(
     )
 );
 
-echo json_encode($datatables->get(
+echo json_encode($datatable->get(
     $_GET
 ));
 ```

@@ -6,6 +6,6 @@
     "grunt-contrib-uglify": "^3.3.0"
   },
   "dependencies": {
-    "datatables.net": "^1.10.16"
+    "datatables.net": "^1.10"
   }
 }

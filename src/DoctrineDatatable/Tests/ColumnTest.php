@@ -49,6 +49,7 @@ class ColumnTest extends OrmTestCase
 
     /**
      * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\UnfilterableColumn
      * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
      */
     public function testWhereWithStringResolve(): void
@@ -80,6 +81,7 @@ class ColumnTest extends OrmTestCase
 
     /**
      * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\UnfilterableColumn
      * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
      */
     public function testWhereWithCallableResolve(): void
@@ -111,6 +113,7 @@ class ColumnTest extends OrmTestCase
 
     /**
      * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\UnfilterableColumn
      * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
      */
     public function testWhereWithNotResolvedColumnType(): void
@@ -133,6 +136,7 @@ class ColumnTest extends OrmTestCase
 
     /**
      * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\UnfilterableColumn
      * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
      */
     public function testWhereWithNotResolvedWhereType(): void
@@ -144,6 +148,28 @@ class ColumnTest extends OrmTestCase
             'e.firstname',
             10,
             ':firstname'
+        );
+
+        $query = $this->entityManager->createQueryBuilder()
+            ->select('u')
+            ->from(User::class, 'u');
+
+        $column->where($query, 10);
+    }
+
+    /**
+     * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
+     * @throws \DoctrineDatatable\Exception\UnfilterableColumn
+     * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
+     */
+    public function testWhereWithUnfilterableColumn(): void
+    {
+        $this->expectException(\DoctrineDatatable\Exception\UnfilterableColumn::class);
+
+        $column = new Column(
+            'firstname',
+            'e.firstname',
+            null
         );
 
         $query = $this->entityManager->createQueryBuilder()

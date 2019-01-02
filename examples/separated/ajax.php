@@ -41,6 +41,5 @@ $datatable = new \DoctrineDatatable\Datatable(
 );
 
 echo json_encode(
-    $datatable->setGlobalSearch(true)
-        ->get($_POST)
+    $datatable->get($_POST)
 );

@@ -132,12 +132,12 @@ class Datatable
         $expr = new Expr();
         $temp = '';
 
-        foreach ($filters as $alias => $filtre) {
-            $column = $this->getColumnFromAlias($alias);
-            if ($column instanceof Column && !empty($filtre)) {
+        foreach ($filters['columns'] as $index => $filter) {
+            $column = isset($this->columns[$index]) ? $this->columns[$index] : null;
+            if ($column instanceof Column && !empty($filter['search']['value'])) {
                 $temp .= $this->globalSearch ?
-                    (!empty($temp) ? ' OR ' : '').$expr->orX($column->where($query, $filtre)) :
-                    $expr->andX($column->where($query, $filtre));
+                    (!empty($temp) ? ' OR ' : '').$expr->orX($column->where($query, $filter['search']['value'])) :
+                    (!empty($temp) ? ' AND ' : '').$expr->andX($column->where($query, $filter['search']['value']));
             }
         }
 

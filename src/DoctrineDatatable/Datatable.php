@@ -120,14 +120,11 @@ class Datatable
         $expr = new Expr();
         $temp = '';
 
-        $filt = isset($filters['columns']) ? $filters['columns'] : array();
-
-        foreach ($filt as $index => $filter) {
+        foreach (isset($filters['columns']) ? $filters['columns'] : array() as $index => $filter) {
             $column = isset($this->columns[$index]) ? $this->columns[$index] : null;
             if ($column instanceof Column && !empty($filter['search']['value'])) {
-                $temp .= $this->globalSearch ?
-                    (!empty($temp) ? ' OR ' : '').$expr->orX($column->where($query, $filter['search']['value'])) :
-                    (!empty($temp) ? ' AND ' : '').$expr->andX($column->where($query, $filter['search']['value']));
+                $temp .= ($this->globalSearch ? (!empty($temp) ? ' OR ' : '') : (!empty($temp) ? ' AND ' : '')).
+                    $expr->andX($column->where($query, $filter['search']['value']));
             }
         }
 

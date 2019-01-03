@@ -13,7 +13,8 @@
         "phpunit/phpunit": "^7.0",
         "friendsofphp/php-cs-fixer": "^2.14@dev",
         "pheromone/phpcs-security-audit": "dev-master",
-        "sensiolabs/security-checker": "^5.0@dev"
+        "sensiolabs/security-checker": "^5.0@dev",
+        "phan/phan": "^1.1"
     },
     "license": "MIT",
     "authors": [

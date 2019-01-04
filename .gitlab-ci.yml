@@ -82,6 +82,15 @@ php_lint:
     - ./vendor/bin/php-cs-fixer fix --dry-run --config=.php_cs.dist --using-cache=no --diff --diff-format=udiff --allow-risky=yes
   stage: lint
 
+phpan:
+  <<: *php_script
+  image: php:7.2
+  script:
+    - pecl install ast
+    - echo "extension=$(find /usr/local/lib/php/extensions/ -name ast.so)" > /usr/local/etc/php/conf.d/ast.ini
+    - ./vendor/bin/phan
+  stage: lint
+
 phpunit_71:
   <<: *php_script
   <<: *phpunit_script

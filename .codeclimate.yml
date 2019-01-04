@@ -17,6 +17,10 @@ plugins:
     config:
       file_extensions: "php"
       rulesets: "cleancode,codesize,unusedcode,controversial,design,naming"
+  phan:
+    enabled: true
+    config:
+      file_extensions: "php"
 exclude_patterns:
   - ".bundle/"
   - "**/node_modules/*"

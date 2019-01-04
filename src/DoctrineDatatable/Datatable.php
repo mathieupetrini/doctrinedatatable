@@ -2,7 +2,6 @@
 
 namespace DoctrineDatatable;
 
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use DoctrineDatatable\Exception\MinimumColumn;
 
@@ -117,14 +116,13 @@ class Datatable
      */
     private function createWherePart(QueryBuilder &$query, array $filters): string
     {
-        $expr = new Expr();
         $temp = '';
 
         foreach (isset($filters['columns']) ? $filters['columns'] : array() as $index => $filter) {
             $column = isset($this->columns[$index]) ? $this->columns[$index] : null;
             if ($column instanceof Column && !empty($filter['search']['value'])) {
                 $temp .= (!empty($temp) ? ' '.($this->globalSearch ? 'OR' : 'AND').' ' : '').
-                    $expr->andX($column->where($query, $filter['search']['value']));
+                    $column->where($query, $filter['search']['value']);
             }
         }
 
@@ -275,7 +273,7 @@ class Datatable
      */
     private function columns(): array
     {
-        return array_map(static function (Column $column) {
+        return array_map(static function (Column $column): array {
             return array(
                 'data' => $column->getAlias(),
             );

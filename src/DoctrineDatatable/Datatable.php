@@ -273,7 +273,7 @@ class Datatable
      */
     private function columns(): array
     {
-        return array_map(static function (Column $column) {
+        return array_map(static function (Column $column): array {
             return array(
                 'data' => $column->getAlias(),
             );

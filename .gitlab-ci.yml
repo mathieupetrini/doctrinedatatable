@@ -87,7 +87,7 @@ phpan:
   image: php:7.2
   script:
     - pecl install ast
-    - echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name ast.so)" > /usr/local/etc/php/conf.d/ast.ini
+    - echo "extension=$(find /usr/local/lib/php/extensions/ -name ast.so)" > /usr/local/etc/php/conf.d/ast.ini
     - ./vendor/bin/phan
   stage: lint
 

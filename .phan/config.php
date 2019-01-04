@@ -54,7 +54,18 @@ return [
 
         'DollarDollarPlugin',
         'DuplicateArrayKeyPlugin',
+        //'HasPHPDocPlugin',
+        'InvalidVariableIssetPlugin',
+        'InvokePHPNativeSyntaxCheckPlugin',
+        'NoAssertPlugin',
+        'NonBoolBranchPlugin',
+        'NonBoolInLogicalArithPlugin',
+        'NumericalComparisonPlugin',
         'PregRegexCheckerPlugin',
         'PrintfCheckerPlugin',
+        'SleepCheckerPlugin',
+        'UnknownElementTypePlugin',
+        'UnreachableCodePlugin',
+        'UnusedSuppressionPlugin'
     ],
 ];

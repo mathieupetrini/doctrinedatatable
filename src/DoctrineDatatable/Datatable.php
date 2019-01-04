@@ -121,7 +121,7 @@ class Datatable
         foreach (isset($filters['columns']) ? $filters['columns'] : array() as $index => $filter) {
             $column = isset($this->columns[$index]) ? $this->columns[$index] : null;
             if ($column instanceof Column && !empty($filter['search']['value'])) {
-                $temp .= ($this->globalSearch ? (!empty($temp) ? ' OR ' : '') : (!empty($temp) ? ' AND ' : '')).
+                $temp .= (!empty($temp) ? ' '.($this->globalSearch ? 'OR' : 'AND').' ' : '').
                     $column->where($query, $filter['search']['value']);
             }
         }

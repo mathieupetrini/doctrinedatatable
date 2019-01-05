@@ -125,7 +125,6 @@ class Datatable
             }
         }
 
-
         return $temp;
     }
 

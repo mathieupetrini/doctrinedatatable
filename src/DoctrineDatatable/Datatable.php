@@ -119,10 +119,9 @@ class Datatable
         $temp = '';
 
         foreach (isset($filters['columns']) ? $filters['columns'] : array() as $index => $filter) {
-            $column = isset($this->columns[$index]) ? $this->columns[$index] : null;
-            if ($column instanceof Column && !empty($filter['search']['value'])) {
+            if (isset($this->columns[$index]) && !empty($filter['search']['value'])) {
                 $temp .= (!empty($temp) ? ' '.($this->globalSearch ? 'OR' : 'AND').' ' : '').
-                    $column->where($query, $filter['search']['value']);
+                    $this->columns[$index]->where($query, $filter['search']['value']);
             }
         }
 

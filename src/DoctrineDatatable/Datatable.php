@@ -266,20 +266,6 @@ class Datatable
     }
 
     /**
-     * @author Mathieu Petrini <mathieupetrini@gmail.com>
-     *
-     * @return array
-     */
-    private function columns(): array
-    {
-        return array_map(static function (Column $column): array {
-            return array(
-                'data' => $column->getAlias(),
-            );
-        }, $this->columns);
-    }
-
-    /**
      * PUBLIC METHODS.
      */
 

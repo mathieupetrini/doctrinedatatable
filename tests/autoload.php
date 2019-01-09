@@ -13,6 +13,7 @@ require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/OrmTestCase.p
 require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/TestUtil.php';
 require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/OrmFunctionalTestCase.php';
 require_once __DIR__.'/../vendor/doctrine/orm/tools/sandbox/Entities/Address.php';
+
 require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/Models/CMS/CmsUser.php';
 require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/Models/CMS/CmsPhonenumber.php';
 require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/Models/CMS/CmsAddressListener.php';
@@ -22,4 +23,9 @@ require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/Models/CMS/Cm
 require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/Models/CMS/CmsTag.php';
 require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/Models/CMS/CmsArticle.php';
 require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/Models/CMS/CmsComment.php';
+
+require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/Models/DirectoryTree/AbstractContentItem.php';
+require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/Models/DirectoryTree/Directory.php';
+require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/Models/DirectoryTree/File.php';
+
 require_once __DIR__.'/../vendor/doctrine/orm/tests/Doctrine/Tests/DbalTypes/Rot13Type.php';

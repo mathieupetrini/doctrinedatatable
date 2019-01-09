@@ -4,10 +4,16 @@ namespace DoctrineDatatable\Tests;
 
 use Doctrine\Tests\Models\CMS\CmsEmail;
 use Doctrine\Tests\Models\CMS\CmsUser;
+use Doctrine\Tests\Models\DirectoryTree\Directory;
 use DoctrineDatatable\Column;
 use DoctrineDatatable\Editortable;
 use DoctrineDatatable\Exception\MissingData;
 
+/**
+ * Class EditortableTest.
+ *
+ * @codeCoverageIgnore
+ */
 class EditortableTest extends DatatableTest
 {
     /**
@@ -84,6 +90,52 @@ class EditortableTest extends DatatableTest
         $this->assertInstanceOf(
             CmsEmail::class,
             $this->_em->getRepository(CmsUser::class)->findOneBy(array('username' => 'username1'))->getEmail()
+        );
+
+        $this->assertEquals(
+            'mpetrini@gmail.com',
+            $this->_em->getRepository(CmsUser::class)->findOneBy(array('username' => 'username1'))->getEmail()->email
+        );
+    }
+
+    /**
+     * @throws MissingData
+     * @throws \DoctrineDatatable\Exception\MinimumColumn
+     */
+    public function testEditorWithPrivateAttribute(): void
+    {
+        $datatable = new Editortable(
+            $this->_em->createQueryBuilder()
+                ->select('u')
+                ->from(Directory::class, 'd'),
+            'id',
+            array(
+                new Column(
+                    'name',
+                    'd.name',
+                    'd.name LIKE :name',
+                    '%:name%'
+                ),
+                new Column(
+                    'path',
+                    'd.path',
+                    'd.path LIKE :path',
+                    '%:path%'
+                ),
+            )
+        );
+
+        $datatable->edit(array(
+            'data' => array(
+                $this->_em->getRepository(Directory::class)->findOneBy(array('name' => 'unittest'))->getId() => array(
+                    'path' => 'newpathunittest',
+                ),
+            ),
+        ));
+
+        $this->assertEquals(
+            'newpathunittest',
+            $this->_em->getRepository(Directory::class)->findOneBy(array('name' => 'unittest'))->getPath()
         );
     }
 

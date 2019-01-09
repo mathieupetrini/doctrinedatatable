@@ -4,6 +4,7 @@ namespace DoctrineDatatable\Tests;
 
 use Doctrine\Tests\Models\CMS\CmsEmail;
 use Doctrine\Tests\Models\CMS\CmsUser;
+use Doctrine\Tests\Models\DirectoryTree\Directory;
 use Doctrine\Tests\OrmFunctionalTestCase;
 use DoctrineDatatable\Column;
 use DoctrineDatatable\Datatable;
@@ -55,11 +56,16 @@ class DatatableTest extends OrmFunctionalTestCase
         $email2 = new CmsEmail();
         $email2->email = 'mpetrini@gmail.com';
 
+        $directory = new Directory();
+        $directory->setName('unittest');
+        $directory->setPath('coucou/');
+
         $this->_em->persist($user1);
         $this->_em->persist($user2);
         $this->_em->persist($user3);
         $this->_em->persist($user4);
         $this->_em->persist($email2);
+        $this->_em->persist($directory);
         $this->_em->flush();
         $this->_em->clear();
     }
@@ -100,6 +106,7 @@ class DatatableTest extends OrmFunctionalTestCase
     public function setUp(): void
     {
         $this->useModelSet('cms');
+        $this->useModelSet('directorytree');
         parent::setUp();
 
         $this->generateFixtures();

@@ -121,7 +121,7 @@ class Datatable
         foreach (isset($filters['columns']) ? $filters['columns'] : array() as $index => $filter) {
             if (isset($this->columns[$index]) && !empty($filter['search']['value'])) {
                 $temp .= (!empty($temp) ? ' '.($this->globalSearch ? 'OR' : 'AND').' ' : '').
-                    $this->columns[$index]->where($query, $filter['search']['value']);
+                    '('.$this->columns[$index]->where($query, $filter['search']['value']).')';
             }
         }
 
@@ -266,20 +266,6 @@ class Datatable
     }
 
     /**
-     * @author Mathieu Petrini <mathieupetrini@gmail.com>
-     *
-     * @return array
-     */
-    private function columns(): array
-    {
-        return array_map(static function (Column $column): array {
-            return array(
-                'data' => $column->getAlias(),
-            );
-        }, $this->columns);
-    }
-
-    /**
      * PUBLIC METHODS.
      */
 
@@ -287,7 +273,7 @@ class Datatable
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
      * @param array $filters
-     * @param bool  $withColumns (optional) (default=false)
+     * @param int|null $length
      *
      * @return array
      *
@@ -298,7 +284,7 @@ class Datatable
      */
     public function get(
         array $filters,
-        bool $withColumns = false
+        int $length = null
     ): array {
         $query = $this->createQueryResult();
         $this->createFoundationQuery($query, $filters);
@@ -306,7 +292,7 @@ class Datatable
         $data = $this->limit(
             $query,
             isset($filters['start']) ? $filters['start'] : 0,
-            isset($filters['length']) ? $filters['length'] : $this->resultPerPage
+            $length ?? (isset($filters['length']) ? $filters['length'] : $this->resultPerPage)
         )->result(
             $query,
             isset($filters['order']) && isset($filters['order'][0]) ?
@@ -322,10 +308,6 @@ class Datatable
             'recordsFiltered' => \count($data),
             'data' => $data,
         );
-
-        if ($withColumns) {
-            $ret['columns'] = $this->columns();
-        }
 
         return $ret;
     }

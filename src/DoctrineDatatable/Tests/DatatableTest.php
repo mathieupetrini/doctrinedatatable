@@ -162,19 +162,12 @@ class DatatableTest extends OrmFunctionalTestCase
             ),
             0,
             'ASC',
-            true
+            30
         );
 
         $this->assertEquals(1, $result['recordsTotal']);
         $this->assertEquals(1, $result['recordsFiltered']);
         $this->assertCount(1, $result['data']);
-        $this->assertEquals(
-            array(
-                array('data' => 'name'),
-                array('data' => 'status'),
-            ),
-            $result['columns']
-        );
     }
 
     /**

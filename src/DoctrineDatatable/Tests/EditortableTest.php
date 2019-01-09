@@ -147,4 +147,17 @@ class EditortableTest extends DatatableTest
         $this->expectException(MissingData::class);
         $this->datatable->edit(array());
     }
+
+    public function testToUpperCamelCase(): void
+    {
+        $this->assertEquals(
+            'Name',
+            Editortable::toUpperCamelCase('name')
+        );
+
+        $this->assertEquals(
+            'FieldGoal',
+            Editortable::toUpperCamelCase('field_goal')
+        );
+    }
 }

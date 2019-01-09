@@ -39,13 +39,7 @@ class Editortable extends Datatable
      */
     private function processValue(object $entity, string $field, $value): array
     {
-        $ccField = preg_replace_callback(
-            '/_(.?)/',
-            function (array $matches): string {
-                return strtoupper($matches[1]);
-            },
-            ucfirst($field)
-        );
+        $ccField = self::toUpperCamelCase($field);
 
         $field = property_exists($entity, $ccField) ? $ccField : $field;
         if (property_exists($entity, $field)) {
@@ -125,5 +119,21 @@ class Editortable extends Datatable
         }
 
         return $this->processEditing($params);
+    }
+
+    /**
+     * @param string $field
+     *
+     * @return string
+     */
+    public static function toUpperCamelCase(string $field): string
+    {
+        return preg_replace_callback(
+            '/_(.?)/',
+            function (array $matches): string {
+                return strtoupper($matches[1]);
+            },
+            ucfirst($field)
+        );
     }
 }

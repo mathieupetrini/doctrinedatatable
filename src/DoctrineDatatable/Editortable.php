@@ -41,7 +41,7 @@ class Editortable extends Datatable
     {
         $ccField = preg_replace_callback(
             '/_(.?)/',
-            function ($matches) {
+            function (array $matches): string {
                 return strtoupper($matches[1]);
             },
             ucfirst($field)

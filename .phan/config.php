@@ -11,7 +11,7 @@ return [
     // If this is set to null,
     // then Phan assumes the PHP version which is closest to the minor version
     // of the php executable used to execute phan.
-    "target_php_version" => '7.1',
+    "target_php_version" => '7.2',
 
     // A list of directories that should be parsed for class and
     // method information. After excluding the directories
@@ -22,7 +22,8 @@ return [
     // your application should be included in this list.
     'directory_list' => [
         'src',
-        'vendor/doctrine/orm/lib/Doctrine/ORM/'
+        'vendor/doctrine/orm/lib/Doctrine/ORM/',
+        'vendor/doctrine/persistence/lib/Doctrine/Common/Persistence/'
     ],
 
     // A directory list that defines files that will be excluded
@@ -61,6 +62,7 @@ return [
         'NonBoolBranchPlugin',
         'NonBoolInLogicalArithPlugin',
         'NumericalComparisonPlugin',
+        'PHPUnitNotDeadCodePlugin',
         'PregRegexCheckerPlugin',
         'PrintfCheckerPlugin',
         'SleepCheckerPlugin',

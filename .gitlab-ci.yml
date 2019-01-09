@@ -91,11 +91,6 @@ phpan:
     - ./vendor/bin/phan
   stage: lint
 
-phpunit_71:
-  <<: *php_script
-  <<: *phpunit_script
-  image: php:7.1
-
 phpunit_72:
   <<: *php_script
   <<: *phpunit_script

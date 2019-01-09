@@ -79,7 +79,7 @@ php_lint:
   <<: *php_script
   image: php:7.2
   script:
-    - ./vendor/bin/php-cs-fixer fix --dry-run --config=.php_cs.dist --using-cache=no --diff --diff-format=udiff --allow-risky=yes
+    - ./vendor/bin/php-cs-fixer fix --config=.php_cs.dist --using-cache=no --diff --diff-format=udiff --allow-risky=yes --dry-run
   stage: lint
 
 phpan:

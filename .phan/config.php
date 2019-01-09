@@ -52,9 +52,9 @@ return [
 
         // can also be written as 'vendor/phan/phan/.phan/plugins/AlwaysReturnPlugin.php'
         'AlwaysReturnPlugin',
-
         'DollarDollarPlugin',
         'DuplicateArrayKeyPlugin',
+        'DuplicateExpressionPlugin',
         //'HasPHPDocPlugin',
         'InvalidVariableIssetPlugin',
         'InvokePHPNativeSyntaxCheckPlugin',

@@ -221,8 +221,8 @@ class Datatable
      */
     private function limit(QueryBuilder &$query, array $filters): self
     {
-        $query->setFirstResult(isset($filters['start']) ? $filters['start'] : 0)
-            ->setMaxResults(isset($filters['length']) ? $filters['length'] : $this->resultPerPage);
+        $query->setFirstResult($filters['start'] ?? 0)
+            ->setMaxResults($filters['length'] ?? $this->resultPerPage);
 
         return $this;
     }

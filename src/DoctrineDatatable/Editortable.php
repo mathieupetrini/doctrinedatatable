@@ -39,7 +39,13 @@ class Editortable extends Datatable
      */
     private function processValue(object $entity, string $field, $value): array
     {
-        $ccField = preg_replace_callback('/_(.?)/', function ($matches) { return strtoupper($matches[1]); }, ucfirst($field));
+        $ccField = preg_replace_callback(
+            '/_(.?)/',
+            function ($matches) {
+                return strtoupper($matches[1]);
+            },
+            ucfirst($field)
+        );
 
         $field = property_exists($entity, $ccField) ? $ccField : $field;
         if (property_exists($entity, $field)) {

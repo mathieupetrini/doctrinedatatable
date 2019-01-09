@@ -6,6 +6,7 @@ use Doctrine\Tests\Models\CMS\CmsEmail;
 use Doctrine\Tests\Models\CMS\CmsUser;
 use DoctrineDatatable\Column;
 use DoctrineDatatable\Editortable;
+use DoctrineDatatable\Exception\MissingData;
 
 class EditortableTest extends DatatableTest
 {
@@ -84,5 +85,14 @@ class EditortableTest extends DatatableTest
             CmsEmail::class,
             $this->_em->getRepository(CmsUser::class)->findOneBy(array('username' => 'username1'))->getEmail()
         );
+    }
+
+    /**
+     * @throws MissingData
+     */
+    public function testEditWithoutData(): void
+    {
+        $this->expectException(MissingData::class);
+        $this->datatable->edit(array());
     }
 }

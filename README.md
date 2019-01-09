@@ -16,7 +16,7 @@ datatable inside yours Web Application.
 
 DoctrineDatatable requires : 
 
-* <a href="http://php.net/">PHP 7.1+</a>
+* <a href="http://php.net/">PHP 7.2+</a>
 * <a href="https://github.com/doctrine/doctrine2">Doctrine2 2.4+</a>
 * <a href="https://github.com/DataTables/DataTables">jQueryDatatable 1.10+</a>
 

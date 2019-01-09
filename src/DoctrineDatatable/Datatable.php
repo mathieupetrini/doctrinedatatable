@@ -272,7 +272,7 @@ class Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param array $filters
+     * @param array    $filters
      * @param int|null $length
      *
      * @return array

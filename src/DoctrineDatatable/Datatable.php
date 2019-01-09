@@ -13,11 +13,6 @@ use DoctrineDatatable\Exception\MinimumColumn;
 class Datatable
 {
     /**
-     * @var QueryBuilder
-     */
-    private $query;
-
-    /**
      * @var string
      */
     private $identifier;
@@ -41,6 +36,11 @@ class Datatable
      * @var bool
      */
     private $globalSearch;
+
+    /**
+     * @var QueryBuilder
+     */
+    protected $query;
 
     private const DEFAULT_NAME_IDENTIFIER = 'DT_RowID';
 
@@ -118,7 +118,7 @@ class Datatable
     {
         $temp = '';
 
-        foreach (isset($filters['columns']) ? $filters['columns'] : array() as $index => $filter) {
+        foreach ($filters['columns'] as $index => $filter) {
             if (isset($this->columns[$index]) && !empty($filter['search']['value'])) {
                 $temp .= (!empty($temp) ? ' '.($this->globalSearch ? 'OR' : 'AND').' ' : '').
                     '('.$this->columns[$index]->where($query, $filter['search']['value']).')';
@@ -147,7 +147,9 @@ class Datatable
             $filters = $this->createGlobalFilters($filters);
         }
 
-        $temp = $this->createWherePart($query, $filters);
+        $temp = isset($filters['columns']) ?
+            $this->createWherePart($query, $filters) :
+            '';
 
         return !empty($temp) ?
             $query->andWhere($temp) :
@@ -213,15 +215,14 @@ class Datatable
 
     /**
      * @param QueryBuilder $query
-     * @param int          $start
-     * @param int|null     $length
+     * @param array        $filters
      *
      * @return Datatable
      */
-    private function limit(QueryBuilder &$query, int $start, int $length = null): self
+    private function limit(QueryBuilder &$query, array $filters): self
     {
-        $query->setFirstResult($start)
-            ->setMaxResults($length ?? $this->resultPerPage);
+        $query->setFirstResult(isset($filters['start']) ? $filters['start'] : 0)
+            ->setMaxResults($length ?? (isset($filters['length']) ? $filters['length'] : $this->resultPerPage));
 
         return $this;
     }
@@ -272,8 +273,7 @@ class Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param array    $filters
-     * @param int|null $length
+     * @param array $filters
      *
      * @return array
      *
@@ -282,34 +282,26 @@ class Datatable
      * @throws Exception\WhereColumnNotHandle
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function get(
-        array $filters,
-        int $length = null
-    ): array {
+    public function get(array $filters): array
+    {
         $query = $this->createQueryResult();
         $this->createFoundationQuery($query, $filters);
 
-        $data = $this->limit(
+        $data = $this->limit($query, $filters)->result(
             $query,
-            isset($filters['start']) ? $filters['start'] : 0,
-            $length ?? (isset($filters['length']) ? $filters['length'] : $this->resultPerPage)
-        )->result(
-            $query,
-            isset($filters['order']) && isset($filters['order'][0]) ?
+            isset($filters['order']) ?
                 $filters['order'][0]['column'] :
                 0,
-            isset($filters['order']) && isset($filters['order'][0]) ?
+            isset($filters['order']) ?
                 $filters['order'][0]['dir'] :
                 'ASC'
         );
 
-        $ret = array(
+        return array(
             'recordsTotal' => $this->count($query),
             'recordsFiltered' => \count($data),
             'data' => $data,
         );
-
-        return $ret;
     }
 
     /**

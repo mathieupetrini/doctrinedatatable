@@ -4,7 +4,7 @@
     "keywords": ["datatable", "doctrine", "jquery"],
     "type": "library",
     "require": {
-        "php": "^7.1",
+        "php": "^7.2",
         "doctrine/dbal": "^2.4",
         "doctrine/orm": "^2.4",
         "ext-json": "*"

@@ -127,9 +127,14 @@ class DatatableTest extends OrmFunctionalTestCase
         );
 
         $result = $this->datatable->get(
-            array(),
-            1,
-            'DESC'
+            array(
+                'order' => array(
+                    0 => array(
+                        'column' => 1,
+                        'dir' => 'desc',
+                    ),
+                ),
+            )
         );
 
         $this->assertEquals(4, $result['recordsTotal']);
@@ -160,8 +165,6 @@ class DatatableTest extends OrmFunctionalTestCase
                     ),
                 ),
             ),
-            0,
-            'ASC',
             30
         );
 
@@ -181,9 +184,7 @@ class DatatableTest extends OrmFunctionalTestCase
         $result = $this->datatable->get(
             array(
                 'undefined' => 'name1',
-            ),
-            0,
-            'ASC'
+            )
         );
 
         $this->assertEquals(4, $result['recordsTotal']);
@@ -212,9 +213,7 @@ class DatatableTest extends OrmFunctionalTestCase
                     'search' => array(
                         'value' => 'name1',
                     ),
-                ),
-                0,
-                'ASC'
+                )
             );
 
         $this->assertEquals(1, $result['recordsTotal']);

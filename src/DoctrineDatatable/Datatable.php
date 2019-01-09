@@ -273,8 +273,6 @@ class Datatable
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
      * @param array    $filters
-     * @param int      $index     (optional) (default=0)
-     * @param string   $direction (optional) (default='ASC')
      * @param int|null $length
      *
      * @return array
@@ -286,8 +284,6 @@ class Datatable
      */
     public function get(
         array $filters,
-        int $index = 0,
-        string $direction = 'ASC',
         int $length = null
     ): array {
         $query = $this->createQueryResult();
@@ -297,7 +293,15 @@ class Datatable
             $query,
             isset($filters['start']) ? $filters['start'] : 0,
             $length ?? (isset($filters['length']) ? $filters['length'] : $this->resultPerPage)
-        )->result($query, $index, $direction);
+        )->result(
+            $query,
+            isset($filters['order']) && isset($filters['order'][0]) ?
+                $filters['order'][0]['column'] :
+                0,
+            isset($filters['order']) && isset($filters['order'][0]) ?
+                $filters['order'][0]['dir'] :
+                'ASC'
+        );
 
         $ret = array(
             'recordsTotal' => $this->count($query),

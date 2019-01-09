@@ -2,7 +2,9 @@
 
 namespace DoctrineDatatable\Tests;
 
+use Doctrine\Tests\Models\CMS\CmsEmail;
 use Doctrine\Tests\Models\CMS\CmsUser;
+use Doctrine\Tests\Models\DirectoryTree\Directory;
 use Doctrine\Tests\OrmFunctionalTestCase;
 use DoctrineDatatable\Column;
 use DoctrineDatatable\Datatable;
@@ -17,14 +19,14 @@ class DatatableTest extends OrmFunctionalTestCase
     /**
      * @var Datatable
      */
-    private $datatable;
+    protected $datatable;
 
     /**
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    private function generateFixtures(): void
+    protected function generateFixtures(): void
     {
         $user1 = new CmsUser();
         $user1->status = 'st1';
@@ -46,27 +48,33 @@ class DatatableTest extends OrmFunctionalTestCase
         $user4->username = 'username4';
         $user4->name = 'name4';
 
+        $email = new CmsEmail();
+        $email->email = 'mathieupetrini@gmail.com';
+
+        $user1->setEmail($email);
+
+        $email2 = new CmsEmail();
+        $email2->email = 'mpetrini@gmail.com';
+
+        $directory = new Directory();
+        $directory->setName('unittest');
+        $directory->setPath('coucou/');
+
         $this->_em->persist($user1);
         $this->_em->persist($user2);
         $this->_em->persist($user3);
         $this->_em->persist($user4);
+        $this->_em->persist($email2);
+        $this->_em->persist($directory);
         $this->_em->flush();
         $this->_em->clear();
     }
 
     /**
      * @throws \DoctrineDatatable\Exception\MinimumColumn
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function setUp(): void
+    protected function initDatatable(): void
     {
-        $this->useModelSet('cms');
-        parent::setUp();
-
-        $this->generateFixtures();
-
         $this->datatable = new Datatable(
             $this->_em->createQueryBuilder()
                 ->select('u')
@@ -87,6 +95,22 @@ class DatatableTest extends OrmFunctionalTestCase
                 ),
             )
         );
+    }
+
+    /**
+     * @throws \DoctrineDatatable\Exception\MinimumColumn
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function setUp(): void
+    {
+        $this->useModelSet('cms');
+        $this->useModelSet('directorytree');
+        parent::setUp();
+
+        $this->generateFixtures();
+        $this->initDatatable();
     }
 
     /**
@@ -164,8 +188,7 @@ class DatatableTest extends OrmFunctionalTestCase
                         ),
                     ),
                 ),
-            ),
-            30
+            )
         );
 
         $this->assertEquals(1, $result['recordsTotal']);

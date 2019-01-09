@@ -2,17 +2,10 @@
 
 namespace DoctrineDatatable\Exception;
 
-/**
- * Class MinimumColumn.
- *
- * @author Mathieu Petrini <mathieupetrini@gmail.com>
- *
- * @codeCoverageIgnore
- */
-class MinimumColumn extends \Exception
+class MissingData extends \Exception
 {
     /**
-     * MinimumColumn constructor.
+     * MissingData constructor.
      *
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
@@ -22,7 +15,7 @@ class MinimumColumn extends \Exception
     public function __construct($code = 0, \Throwable $previous = null)
     {
         parent::__construct(
-            'At least one column is mandatory to initialize a datatable',
+            'Data parameters not found.',
             $code,
             $previous
         );

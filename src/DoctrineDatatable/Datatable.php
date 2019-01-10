@@ -132,48 +132,6 @@ class Datatable
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
      * @param QueryBuilder $query
-     * @param array        $filters
-     *
-     * @return QueryBuilder
-     *
-     * @throws Exception\ResolveColumnNotHandle
-     * @throws Exception\UnfilterableColumn
-     * @throws Exception\WhereColumnNotHandle
-     */
-    private function createFoundationQuery(QueryBuilder &$query, array $filters): QueryBuilder
-    {
-        // If global search we erase all specific where and only keep the unified filter
-        if ($this->globalSearch && isset($filters['search']) && !empty($filters['search'][Column::GLOBAL_ALIAS])) {
-            $filters = $this->createGlobalFilters($filters);
-        }
-
-        $temp = isset($filters['columns']) ?
-            $this->createWherePart($query, $filters) :
-            '';
-
-        return !empty($temp) ?
-            $query->andWhere($temp) :
-            $query;
-    }
-
-    /**
-     * @return QueryBuilder
-     */
-    private function createQueryResult(): QueryBuilder
-    {
-        $query = clone $this->query;
-        $query->select($this->processColumnIdentifier($query));
-        foreach ($this->columns as $column) {
-            $this->processColumnSelect($query, $column);
-        }
-
-        return $query;
-    }
-
-    /**
-     * @author Mathieu Petrini <mathieupetrini@gmail.com>
-     *
-     * @param QueryBuilder $query
      * @param bool         $withAlias (optional) (default=true)
      *
      * @return string
@@ -231,12 +189,79 @@ class Datatable
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
      * @param QueryBuilder $query
+     *
+     * @return int
+     */
+    private function count(QueryBuilder $query): int
+    {
+        $query = clone $query;
+        $result = $query->select('COUNT(DISTINCT '.$this->processColumnIdentifier($query, false).') as count')
+            ->resetDQLPart('orderBy')
+            ->resetDQLPart('groupBy')
+            ->getQuery()
+            ->getScalarResult();
+
+        return !empty($result) ?
+            (int) $result[0]['count'] :
+            0;
+    }
+
+    /**
+     * PROTECTED METHODS.
+     */
+
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param array        $filters
+     *
+     * @return QueryBuilder
+     *
+     * @throws Exception\ResolveColumnNotHandle
+     * @throws Exception\UnfilterableColumn
+     * @throws Exception\WhereColumnNotHandle
+     */
+    protected function createFoundationQuery(QueryBuilder &$query, array $filters): QueryBuilder
+    {
+        // If global search we erase all specific where and only keep the unified filter
+        if ($this->globalSearch && isset($filters['search']) && !empty($filters['search'][Column::GLOBAL_ALIAS])) {
+            $filters = $this->createGlobalFilters($filters);
+        }
+
+        $temp = isset($filters['columns']) ?
+            $this->createWherePart($query, $filters) :
+            '';
+
+        return !empty($temp) ?
+            $query->andWhere($temp) :
+            $query;
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    protected function createQueryResult(): QueryBuilder
+    {
+        $query = clone $this->query;
+        $query->select($this->processColumnIdentifier($query));
+        foreach ($this->columns as $column) {
+            $this->processColumnSelect($query, $column);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
      * @param int          $index
      * @param string       $direction
      *
      * @return array
      */
-    private function result(
+    protected function result(
         QueryBuilder &$query,
         int $index,
         string $direction
@@ -245,25 +270,6 @@ class Datatable
 
         return $query->getQuery()
             ->getResult();
-    }
-
-    /**
-     * @author Mathieu Petrini <mathieupetrini@gmail.com>
-     *
-     * @param QueryBuilder $query
-     *
-     * @return int
-     *
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    private function count(QueryBuilder $query): int
-    {
-        $query = clone $query;
-
-        return (int) ($query->select('COUNT(DISTINCT '.$this->processColumnIdentifier($query, false).')')
-            ->resetDQLPart('orderBy')
-            ->getQuery()
-            ->getSingleScalarResult());
     }
 
     /**

@@ -27,3 +27,4 @@ exclude_patterns:
   - "**/vendor/"
   - "**/*.js"
   - "**/examples/"
+  - "**/*Test.php"

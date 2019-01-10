@@ -106,7 +106,7 @@ class EditortableTest extends DatatableTest
     {
         $datatable = new Editortable(
             $this->_em->createQueryBuilder()
-                ->select('u')
+                ->select('d')
                 ->from(Directory::class, 'd'),
             'id',
             array(

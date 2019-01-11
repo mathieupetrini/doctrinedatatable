@@ -105,12 +105,17 @@ class Editortable extends Datatable
      * @param object[] $entities
      *
      * @return array
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     private function getResultsAfterEdit(array $entities): array
     {
         if (empty($entities)) {
             return array();
         }
+
+        $this->query->getEntityManager()->flush($entities);
 
         return $this->createQueryResult()
             ->where($this->query->getRootAliases()[0].' IN (:entities)')
@@ -133,6 +138,8 @@ class Editortable extends Datatable
      * @return array
      *
      * @throws MissingData
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function edit(array $params): array
     {

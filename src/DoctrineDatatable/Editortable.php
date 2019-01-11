@@ -100,6 +100,27 @@ class Editortable extends Datatable
     }
 
     /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param object[] $entities
+     *
+     * @return array
+     */
+    private function getResultsAfterEdit(array $entities): array
+    {
+        if (empty($entities)) {
+            return array();
+        }
+
+        return (clone $this->query)->where(
+            $this->query->getRootAliases()[0].' IN (:entities)'
+        )
+            ->setParameter('entities', $entities)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * PUBLIC METHODS.
      */
 
@@ -118,7 +139,9 @@ class Editortable extends Datatable
             throw new MissingData();
         }
 
-        return $this->processEditing($params);
+        return $this->getResultsAfterEdit(
+            $this->processEditing($params)
+        );
     }
 
     /**

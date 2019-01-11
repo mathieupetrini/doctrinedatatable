@@ -18,11 +18,6 @@ class Datatable
     private $identifier;
 
     /**
-     * @var Column[]
-     */
-    private $columns;
-
-    /**
      * @var int
      */
     private $resultPerPage;
@@ -42,7 +37,12 @@ class Datatable
      */
     protected $query;
 
-    private const DEFAULT_NAME_IDENTIFIER = 'DT_RowID';
+    /**
+     * @var Column[]
+     */
+    protected $columns;
+
+    private const DEFAULT_NAME_IDENTIFIER = 'DT_RowId';
 
     public const RESULT_PER_PAGE = 30;
 
@@ -286,7 +286,6 @@ class Datatable
      * @throws Exception\ResolveColumnNotHandle
      * @throws Exception\UnfilterableColumn
      * @throws Exception\WhereColumnNotHandle
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function get(array $filters): array
     {

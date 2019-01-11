@@ -148,6 +148,44 @@ class EditortableTest extends DatatableTest
         $this->datatable->edit(array());
     }
 
+    /**
+     * @throws MissingData
+     * @throws \DoctrineDatatable\Exception\MinimumColumn
+     */
+    public function testEditorWithObjectNotFound(): void
+    {
+        $datatable = new Editortable(
+            $this->_em->createQueryBuilder()
+                ->select('d')
+                ->from(Directory::class, 'd'),
+            'id',
+            array(
+                new Column(
+                    'name',
+                    'd.name',
+                    'd.name LIKE :name',
+                    '%:name%'
+                ),
+                new Column(
+                    'path',
+                    'd.path',
+                    'd.path LIKE :path',
+                    '%:path%'
+                ),
+            )
+        );
+
+        $this->assertEmpty(
+            $datatable->edit(array(
+                'data' => array(
+                    -1 => array(
+                        'path' => 'newpathunittest',
+                    ),
+                ),
+            ))
+        );
+    }
+
     public function testToUpperCamelCase(): void
     {
         $this->assertEquals(

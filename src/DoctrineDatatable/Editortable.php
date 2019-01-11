@@ -112,10 +112,11 @@ class Editortable extends Datatable
             return array();
         }
 
-        return (clone $this->query)->where(
-            $this->query->getRootAliases()[0].' IN (:entities)'
-        )
-            ->setParameter('entities', $entities)
+        return $this->createQueryResult()
+            ->where($this->query->getRootAliases()[0].' IN (:entities)')
+            ->setParameters(array(
+                'entities' => $entities,
+            ))
             ->getQuery()
             ->getResult();
     }

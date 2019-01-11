@@ -2,7 +2,6 @@
 
 namespace DoctrineDatatable;
 
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use DoctrineDatatable\Exception\MissingData;
 
@@ -101,6 +100,27 @@ class Editortable extends Datatable
     }
 
     /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param object[] $entities
+     *
+     * @return array
+     */
+    private function getResultsAfterEdit(array $entities): array
+    {
+        if (empty($entities)) {
+            return array();
+        }
+
+        return (clone $this->query)->where(
+            $this->query->getRootAliases()[0].' IN (:entities)'
+        )
+            ->setParameter('entities', $entities)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * PUBLIC METHODS.
      */
 
@@ -119,42 +139,9 @@ class Editortable extends Datatable
             throw new MissingData();
         }
 
-        $tab = array();
-        foreach ($this->processEditing($params) as $index => $entity) {
-            $tab[$index] = array();
-            foreach ($this->columns as $column) {
-                $table_alias = array();
-                preg_match('/^[^\.]{1,}/', $column->getName(), $table_alias);
-
-                /**
-                 * @var array $temp
-                 */
-                $temp = array_filter(
-                    $this->query->getDQLPart('join'),
-                    function (array $join) use($table_alias) {
-                        return $join[0]->getAlias() === $table_alias[0];
-                    }
-                );
-
-                if ($table_alias[0] === $this->query->getAllAliases()[0]) {
-                    $tab[$index][$column->getAlias()] = $entity->{'get'.self::toUpperCamelCase($column->getAlias())}();
-                } else {
-                    $attribute_name = str_replace(
-                        array_keys($temp)[0].'.',
-                        '',
-                        reset($temp)[0]->getJoin()
-                    );
-
-                    $child_object = $entity->{'get'.self::toUpperCamelCase($attribute_name)}();
-
-                    $tab[$index][$column->getAlias()] = $child_object->{'get'.self::toUpperCamelCase($column->getAlias())}();
-                }
-
-
-            }
-        }
-
-        return $tab;
+        return $this->getResultsAfterEdit(
+            $this->processEditing($params)
+        );
     }
 
     /**

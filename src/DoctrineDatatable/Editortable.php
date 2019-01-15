@@ -16,12 +16,27 @@ class Editortable extends Datatable
     private $rootClass;
 
     /**
-     * {@inheritdoc}
+     * @var array
      */
-    public function __construct(QueryBuilder $query, string $identifier, array $columns, ?int $resultPerPage = self::RESULT_PER_PAGE)
+    private $parameters;
+
+    /**
+     * Editortable constructor.
+     *
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param QueryBuilder $query
+     * @param string       $identifier
+     * @param array        $columns
+     * @param array        $parameters
+     *
+     * @throws Exception\MinimumColumn
+     */
+    public function __construct(QueryBuilder $query, string $identifier, array $columns, array $parameters = array())
     {
-        parent::__construct($query, $identifier, $columns, $resultPerPage);
+        parent::__construct($query, $identifier, $columns);
         $this->rootClass = $query->getRootEntities()[0];
+        $this->parameters = $parameters;
     }
 
     /**
@@ -119,8 +134,11 @@ class Editortable extends Datatable
 
         return $this->createQueryResult()
             ->where($this->query->getRootAliases()[0].' IN (:entities)')
-            ->setParameters(array(
-                'entities' => $entities,
+            ->setParameters(array_merge(
+                $this->parameters,
+                array(
+                    'entities' => $entities,
+                )
             ))
             ->getQuery()
             ->getResult();

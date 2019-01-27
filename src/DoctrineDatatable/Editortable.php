@@ -93,7 +93,7 @@ class Editortable extends Datatable
                 $result = $entity->{$property['setter']}($property['value']);
             }
 
-            if (is_object($result)) {
+            if (\is_object($result)) {
                 $entities[] = $result;
             }
         }

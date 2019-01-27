@@ -78,18 +78,27 @@ class Editortable extends Datatable
      *
      * @param object $entity
      * @param array  $data
+     *
+     * @return object[]
      */
-    private function processRowEditing(object $entity, array $data): void
+    private function processRowEditing(object $entity, array $data): array
     {
+        $entities = array();
         foreach ($data as $field => $value) {
             $property = $this->processValue($entity, $field, $value);
 
             if (isset($entity->{$property['field']})) {
-                $entity->{$property['field']} = $property['value'];
+                $result = $entity->{$property['field']} = $property['value'];
             } elseif (method_exists($entity, $property['setter'])) {
-                $entity->{$property['setter']}($property['value']);
+                $result = $entity->{$property['setter']}($property['value']);
+            }
+
+            if (is_object($result)) {
+                $entities[] = $result;
             }
         }
+
+        return $entities;
     }
 
     /**
@@ -106,8 +115,10 @@ class Editortable extends Datatable
         foreach ($params['data'] as $id => $row) {
             $entity = $repository->find($id);
             if (\is_object($entity)) {
-                $this->processRowEditing($entity, $row);
-                $entities[] = $entity;
+                $entities = array_merge(
+                    $entities,
+                    $this->processRowEditing($entity, $row)
+                );
             }
         }
 

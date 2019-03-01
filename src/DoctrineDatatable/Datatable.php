@@ -198,6 +198,8 @@ class Datatable
         $result = $query->select('COUNT(DISTINCT '.$this->processColumnIdentifier($query, false).') as count')
             ->resetDQLPart('orderBy')
             ->resetDQLPart('groupBy')
+            ->setFirstResult(null)
+            ->setMaxResults(null)
             ->getQuery()
             ->getScalarResult();
 

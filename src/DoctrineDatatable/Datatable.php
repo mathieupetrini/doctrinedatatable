@@ -3,6 +3,7 @@
 namespace DoctrineDatatable;
 
 use Doctrine\ORM\QueryBuilder;
+use DoctrineDatatable\Exception\GlobalFilterWithHavingColumn;
 use DoctrineDatatable\Exception\MinimumColumn;
 
 /**
@@ -53,7 +54,7 @@ class Datatable
      *
      * @param QueryBuilder $query
      * @param string       $identifier
-     * @param array        $columns
+     * @param Column[]     $columns
      * @param int|null     $resultPerPage
      *
      * @throws MinimumColumn
@@ -82,9 +83,9 @@ class Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param array $filters
+     * @param mixed[] $filters
      *
-     * @return array
+     * @return mixed[]
      */
     private function createGlobalFilters(array $filters): array
     {
@@ -106,52 +107,32 @@ class Datatable
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
      * @param QueryBuilder $query
-     * @param array        $filters
+     * @param mixed[]      $filters
      *
-     * @return string
-     *
-     * @throws Exception\ResolveColumnNotHandle
-     * @throws Exception\UnfilterableColumn
-     * @throws Exception\WhereColumnNotHandle
-     */
-    private function createWherePart(QueryBuilder &$query, array $filters): string
-    {
-        $temp = '';
-
-        foreach ($filters['columns'] as $index => $filter) {
-            if (isset($this->columns[$index]) && !empty($filter['search']['value']) && !$this->columns[$index]->isHaving()) {
-                $temp .= (!empty($temp) ? ' '.($this->globalSearch ? 'OR' : 'AND').' ' : '').
-                    '('.$this->columns[$index]->where($query, $filter['search']['value']).')';
-            }
-        }
-
-        return $temp;
-    }
-
-    /**
-     * @author Mathieu Petrini <mathieupetrini@gmail.com>
-     *
-     * @param QueryBuilder $query
-     * @param array        $filters
-     *
-     * @return string
+     * @return string[]
      *
      * @throws Exception\ResolveColumnNotHandle
      * @throws Exception\UnfilterableColumn
      * @throws Exception\WhereColumnNotHandle
      */
-    private function createHavingPart(QueryBuilder &$query, array $filters): string
+    private function createCondition(QueryBuilder &$query, array $filters): array
     {
-        $temp = '';
+        $where = '';
+        $having = '';
 
         foreach ($filters['columns'] as $index => $filter) {
-            if (isset($this->columns[$index]) && !empty($filter['search']['value']) && $this->columns[$index]->isHaving()) {
-                $temp .= (!empty($temp) ? ' '.($this->globalSearch ? 'OR' : 'AND').' ' : '').
+            if (isset($this->columns[$index]) && !empty($filter['search']['value'])) {
+                $variable = $this->columns[$index]->isHaving() ? 'having' : 'where';
+
+                $$variable .= (!empty($$variable) ? ' '.($this->globalSearch ? 'OR' : 'AND').' ' : '').
                     '('.$this->columns[$index]->where($query, $filter['search']['value']).')';
             }
         }
 
-        return $temp;
+        return array(
+            'where' => $where,
+            'having' => $having,
+        );
     }
 
     /**
@@ -199,7 +180,7 @@ class Datatable
 
     /**
      * @param QueryBuilder $query
-     * @param array        $filters
+     * @param mixed[]      $filters
      *
      * @return Datatable
      */
@@ -224,7 +205,7 @@ class Datatable
         $result = $query->select('COUNT(DISTINCT '.$this->processColumnIdentifier($query, false).') as count')
             ->resetDQLPart('orderBy')
             ->resetDQLPart('groupBy')
-            ->setFirstResult(null)
+            ->setFirstResult(0)
             ->setMaxResults(null)
             ->getQuery()
             ->getScalarResult();
@@ -242,7 +223,7 @@ class Datatable
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
      * @param QueryBuilder $query
-     * @param array        $filters
+     * @param mixed[]      $filters
      *
      * @return QueryBuilder
      *
@@ -257,21 +238,19 @@ class Datatable
             $filters = $this->createGlobalFilters($filters);
         }
 
-        $temp = isset($filters['columns']) ?
-            $this->createWherePart($query, $filters) :
-            '';
+        $conditions = isset($filters['columns']) ?
+            $this->createCondition($query, $filters) :
+            array();
 
-        $having = isset($filters['columns']) ?
-            $this->createHavingPart($query, $filters) :
-            '';
-
-        if (!empty($temp)) {
-            $query->andWhere($temp);
+        if (isset($conditions['where']) && !empty($conditions['where'])) {
+            $query->andWhere($conditions['where']);
         }
 
-        return !empty($having) ?
-            $query->andHaving($having) :
-            $query;
+        if (isset($conditions['having']) && !empty($conditions['having'])) {
+            $query->andHaving($conditions['having']);
+        }
+
+        return $query;
     }
 
     /**
@@ -295,7 +274,7 @@ class Datatable
      * @param int          $index
      * @param string       $direction
      *
-     * @return array
+     * @return mixed[]
      */
     protected function result(
         QueryBuilder &$query,
@@ -315,9 +294,9 @@ class Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param array $filters
+     * @param mixed[] $filters
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws Exception\ResolveColumnNotHandle
      * @throws Exception\UnfilterableColumn
@@ -373,10 +352,19 @@ class Datatable
      * @param bool $globalSearch
      *
      * @return Datatable
+     *
+     * @throws GlobalFilterWithHavingColumn
      */
     public function setGlobalSearch(bool $globalSearch): self
     {
         $this->globalSearch = $globalSearch;
+        if ($this->globalSearch) {
+            foreach ($this->columns as $column) {
+                if ($column->isHaving()) {
+                    throw new GlobalFilterWithHavingColumn();
+                }
+            }
+        }
 
         return $this;
     }

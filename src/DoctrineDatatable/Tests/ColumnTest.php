@@ -199,4 +199,10 @@ class ColumnTest extends OrmTestCase
             }
         );
     }
+
+    public function testIsHaving(): void
+    {
+        $column = new Column('test', 't.test');
+        $this->assertFalse($column->isHaving());
+    }
 }

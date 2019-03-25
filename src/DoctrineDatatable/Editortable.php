@@ -16,7 +16,7 @@ class Editortable extends Datatable
     private $rootClass;
 
     /**
-     * @var array
+     * @var string[]
      */
     private $parameters;
 
@@ -27,8 +27,8 @@ class Editortable extends Datatable
      *
      * @param QueryBuilder $query
      * @param string       $identifier
-     * @param array        $columns
-     * @param array        $parameters
+     * @param Column[]     $columns
+     * @param string[]     $parameters
      *
      * @throws Exception\MinimumColumn
      */
@@ -50,7 +50,7 @@ class Editortable extends Datatable
      * @param string $field
      * @param mixed  $value
      *
-     * @return array
+     * @return string[]
      */
     private function processValue(object $entity, string $field, $value): array
     {
@@ -76,8 +76,8 @@ class Editortable extends Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param object $entity
-     * @param array  $data
+     * @param object  $entity
+     * @param mixed[] $data
      *
      * @return object[]
      */
@@ -104,9 +104,9 @@ class Editortable extends Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param array $params
+     * @param mixed[] $params
      *
-     * @return array
+     * @return object[]
      */
     private function processEditing(array $params): array
     {
@@ -130,7 +130,7 @@ class Editortable extends Datatable
      *
      * @param object[] $entities
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -162,9 +162,9 @@ class Editortable extends Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param array $params
+     * @param mixed[] $params
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws MissingData
      * @throws \Doctrine\ORM\ORMException
@@ -190,6 +190,11 @@ class Editortable extends Datatable
     {
         return preg_replace_callback(
             '/_(.?)/',
+            /**
+             * @param string[] $matches
+             *
+             * @return string
+             */
             function (array $matches): string {
                 return strtoupper($matches[1]);
             },

@@ -3,6 +3,7 @@
 namespace DoctrineDatatable\Tests;
 
 use Doctrine\Tests\Models\CMS\CmsEmail;
+use Doctrine\Tests\Models\CMS\CmsPhonenumber;
 use Doctrine\Tests\Models\CMS\CmsUser;
 use Doctrine\Tests\Models\DirectoryTree\Directory;
 use Doctrine\Tests\OrmFunctionalTestCase;
@@ -28,6 +29,9 @@ abstract class BaseTest extends OrmFunctionalTestCase
         $user1->status = 'st1';
         $user1->username = 'username1';
         $user1->name = 'name1';
+        $phone = new CmsPhonenumber();
+        $phone->phonenumber = '0102030405';
+        $user1->addPhonenumber($phone);
 
         $user2 = new CmsUser();
         $user2->status = 'st2';

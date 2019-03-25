@@ -129,4 +129,12 @@ class Column
     {
         return $this->name;
     }
+
+    /**
+     * @return bool
+     */
+    public function isHaving(): bool
+    {
+        return false;
+    }
 }

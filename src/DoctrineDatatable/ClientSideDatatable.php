@@ -16,9 +16,9 @@ class ClientSideDatatable extends Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param array $filters
+     * @param mixed[] $filters
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws Exception\ResolveColumnNotHandle
      * @throws Exception\UnfilterableColumn

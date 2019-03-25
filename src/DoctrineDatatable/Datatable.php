@@ -158,32 +158,6 @@ class Datatable
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
      * @param QueryBuilder $query
-     * @param array        $filters
-     *
-     * @return string
-     *
-     * @throws Exception\ResolveColumnNotHandle
-     * @throws Exception\UnfilterableColumn
-     * @throws Exception\WhereColumnNotHandle
-     */
-    private function createHavingPart(QueryBuilder &$query, array $filters): string
-    {
-        $temp = '';
-
-        foreach ($filters['columns'] as $index => $filter) {
-            if (isset($this->columns[$index]) && !empty($filter['search']['value']) && $this->columns[$index]->isHaving()) {
-                $temp .= (!empty($temp) ? ' '.($this->globalSearch ? 'OR' : 'AND').' ' : '').
-                    '('.$this->columns[$index]->where($query, $filter['search']['value']).')';
-            }
-        }
-
-        return $temp;
-    }
-
-    /**
-     * @author Mathieu Petrini <mathieupetrini@gmail.com>
-     *
-     * @param QueryBuilder $query
      * @param bool         $withAlias (optional) (default=true)
      *
      * @return string

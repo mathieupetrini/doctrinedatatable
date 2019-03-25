@@ -100,7 +100,6 @@ phpunit_73:
   <<: *php_script
   <<: *phpunit_script
   image: php:7.3
-  allow_failure: true
 
 code_quality:
   stage: quality

@@ -32,6 +32,9 @@ abstract class BaseTest extends OrmFunctionalTestCase
         $phone = new CmsPhonenumber();
         $phone->phonenumber = '0102030405';
         $user1->addPhonenumber($phone);
+        $phone = new CmsPhonenumber();
+        $phone->phonenumber = '0102030406';
+        $user1->addPhonenumber($phone);
 
         $user2 = new CmsUser();
         $user2->status = 'st2';

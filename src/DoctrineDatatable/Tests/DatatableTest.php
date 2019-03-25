@@ -73,8 +73,10 @@ class DatatableTest extends BaseTest
                 new HavingColumn(
                     'phones',
                     'COUNT(pn)',
-                    'COUNT(pn) > :phones',
-                    ':phones'
+                    'COUNT(pn) >= :phones',
+                    function ($data) {
+                        return (int) $data;
+                    }
                 ),
             )
         );
@@ -226,5 +228,30 @@ class DatatableTest extends BaseTest
         $this->expectException(GlobalFilterWithHavingColumn::class);
         (clone $this->datatableWithHavingColumn)
             ->setGlobalSearch(true);
+    }
+
+    public function testGetWithHavingColumn(): void
+    {
+        $result = (clone $this->datatableWithHavingColumn)->get(array(
+            'columns' => array(
+                array(
+                    'search' => array(
+                        'value' => '',
+                    ),
+                ),
+                array(
+                    'search' => array(
+                        'value' => '',
+                    ),
+                ),
+                array(
+                    'search' => array(
+                        'value' => 1,
+                    ),
+                ),
+            ),
+        ));
+
+        $this->assertEquals(1, $result['recordsTotal']);
     }
 }

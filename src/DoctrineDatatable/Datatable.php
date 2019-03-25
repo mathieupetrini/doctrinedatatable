@@ -122,10 +122,11 @@ class Datatable
 
         foreach ($filters['columns'] as $index => $filter) {
             if (isset($this->columns[$index]) && !empty($filter['search']['value'])) {
-                $variable = $this->columns[$index]->isHaving() ? 'having' : 'where';
+                $temp = '('.$this->columns[$index]->where($query, $filter['search']['value']).')';
 
-                $$variable .= (!empty($$variable) ? ' '.($this->globalSearch ? 'OR' : 'AND').' ' : '').
-                    '('.$this->columns[$index]->where($query, $filter['search']['value']).')';
+                $this->columns[$index]->isHaving() ?
+                    $having .= (!empty($having) ? ' AND ' : '').$temp :
+                    $where .= (!empty($where) ? ' '.($this->globalSearch ? 'OR' : 'AND').' ' : '').$temp;
             }
         }
 
@@ -204,7 +205,6 @@ class Datatable
         $query = clone $query;
         $result = $query->select('COUNT(DISTINCT '.$this->processColumnIdentifier($query, false).') as count')
             ->resetDQLPart('orderBy')
-            ->resetDQLPart('groupBy')
             ->setFirstResult(0)
             ->setMaxResults(null)
             ->getQuery()

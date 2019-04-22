@@ -139,3 +139,6 @@ sast:
   artifacts:
     reports:
       sast: gl-sast-report.json
+
+dependency_scanning:
+  stage: security

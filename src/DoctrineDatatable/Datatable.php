@@ -267,18 +267,6 @@ class Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param QueryBuilder $query
-     *
-     * @return mixed[]
-     */
-    protected function result(QueryBuilder $query): array
-    {
-        return $query->getQuery()->getResult();
-    }
-
-    /**
-     * @author Mathieu Petrini <mathieupetrini@gmail.com>
-     *
      * @param mixed[] $filters
      *
      * @return mixed[]

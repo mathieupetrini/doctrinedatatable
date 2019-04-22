@@ -39,6 +39,9 @@ variables:
 services:
   - docker:dind
 
+include:
+  template: Dependency-Scanning.gitlab-ci.yml
+
 .php_script: &php_script
   before_script:
     - bash ./ci/docker_install.sh > /dev/null
@@ -136,21 +139,3 @@ sast:
   artifacts:
     reports:
       sast: gl-sast-report.json
-
-dependency_scanning:
-  stage: security
-  image: docker:stable
-  variables:
-    DOCKER_DRIVER: overlay2
-  services:
-    - docker:stable-dind
-  script:
-    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
-    - docker run
-      --env DEP_SCAN_DISABLE_REMOTE_CHECKS="${DEP_SCAN_DISABLE_REMOTE_CHECKS:-false}"
-      --volume "$PWD:/code"
-      --volume /var/run/docker.sock:/var/run/docker.sock
-      "registry.gitlab.com/gitlab-org/security-products/dependency-scanning:$SP_VERSION" /code
-  artifacts:
-    reports:
-      dependency_scanning: gl-dependency-scanning-report.json

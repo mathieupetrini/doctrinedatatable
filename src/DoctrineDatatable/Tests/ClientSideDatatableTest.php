@@ -41,7 +41,6 @@ class ClientSideDatatableTest extends BaseTest
      * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
      * @throws \DoctrineDatatable\Exception\UnfilterableColumn
      * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function testGet(): void
     {
@@ -52,7 +51,6 @@ class ClientSideDatatableTest extends BaseTest
      * @throws \DoctrineDatatable\Exception\ResolveColumnNotHandle
      * @throws \DoctrineDatatable\Exception\UnfilterableColumn
      * @throws \DoctrineDatatable\Exception\WhereColumnNotHandle
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function testGetResultWithoutFilter(): void
     {
@@ -69,24 +67,10 @@ class ClientSideDatatableTest extends BaseTest
             $result['data'][0]['status']
         );
 
-        $result = $this->datatable->get(
-            array(
-                'order' => array(
-                    0 => array(
-                        'column' => 1,
-                        'dir' => 'desc',
-                    ),
-                ),
-            )
-        );
+        $result = $this->datatable->get(array());
 
         $this->assertArrayNotHasKey('recordsTotal', $result);
         $this->assertArrayNotHasKey('recordsFiltered', $result);
         $this->assertCount(4, $result['data']);
-
-        $this->assertEquals(
-            'st4',
-            $result['data'][0]['status']
-        );
     }
 }

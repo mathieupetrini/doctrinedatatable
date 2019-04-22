@@ -13,38 +13,12 @@ use DoctrineDatatable\HavingColumn;
  *
  * @codeCoverageIgnore
  */
-class DatatableTest extends BaseTest
+class DatatableTest extends BaseDatatableTest
 {
     /**
      * @var Datatable
      */
     private $datatableWithHavingColumn;
-
-    /**
-     * @throws \DoctrineDatatable\Exception\MinimumColumn
-     */
-    protected function initDatatable(): void
-    {
-        $this->datatable = new Datatable(
-            $this->_em->createQueryBuilder()
-                ->from(CmsUser::class, 'u'),
-            'id',
-            array(
-                new Column(
-                    'name',
-                    'u.name',
-                    'u.name LIKE :name',
-                    '%:name%'
-                ),
-                new Column(
-                    'status',
-                    'u.status',
-                    'u.status = :status',
-                    '%:status%'
-                ),
-            )
-        );
-    }
 
     /**
      * @throws \DoctrineDatatable\Exception\MinimumColumn
@@ -253,5 +227,12 @@ class DatatableTest extends BaseTest
         ));
 
         $this->assertEquals(1, $result['recordsTotal']);
+    }
+
+    public function testExport(): void
+    {
+        $content = $this->datatable->export();
+        $this->assertNotEmpty($content);
+        $this->assertCount(3 * 3, explode("\t", $content));
     }
 }

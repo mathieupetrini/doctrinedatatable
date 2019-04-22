@@ -26,21 +26,11 @@ class ClientSideDatatable extends Datatable
      */
     public function get(array $filters): array
     {
-        $query = $this->createQueryResult();
-        $this->createFoundationQuery($query, $filters);
-
-        $data = $this->result(
-            $query,
-            isset($filters['order']) ?
-                $filters['order'][0]['column'] :
-                0,
-            isset($filters['order']) ?
-                $filters['order'][0]['dir'] :
-                'ASC'
-        );
+        $this->createQueryResult();
+        $this->createFoundationQuery($filters);
 
         return array(
-            'data' => $data,
+            'data' => $this->data($filters),
         );
     }
 }

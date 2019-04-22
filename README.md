@@ -117,6 +117,39 @@ echo json_encode($datatable->get(
 ));
 ```
 
+#### CSV Export
+
+```php
+<?php
+
+use Doctrine\Tests\Models\CMS\CmsUser;
+use DoctrineDataTable\Column;
+use DoctrineDataTable\Datatable;
+
+$em = /** instanceof Doctrine\ORM\EntityManager */;
+
+$datatable = new Datatable(
+    $em->createQueryBuilder()
+        ->select('u')
+        ->from(CmsUser::class, 'u'),
+    'id',
+    array(
+        new Column(
+            'name',
+            'u.name',
+            'u.name LIKE :name',
+            '%:name%'
+        ),
+        new Column(
+            'status',
+            'u.status'
+        ),
+    )
+);
+
+echo $datatable->export();
+```
+
 ## Example
 
 See <a href="https://gitlab.com/mpetrini/doctrinedatatable/blob/master/examples">examples</a> directory.

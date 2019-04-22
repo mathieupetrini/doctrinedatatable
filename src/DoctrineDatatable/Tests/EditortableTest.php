@@ -14,7 +14,7 @@ use DoctrineDatatable\Exception\MissingData;
  *
  * @codeCoverageIgnore
  */
-class EditortableTest extends DatatableTest
+class EditortableTest extends BaseDatatableTest
 {
     /**
      * @var Editortable

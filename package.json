@@ -1,14 +1,13 @@
 {
   "name": "doctrinedatatable",
   "devDependencies": {
-    "bootstrap": "^4.2.1",
-    "changelog-manager": "https://gitlab.com/changelogs/changelog-manager#master",
-    "datatables.net-bs4": "^1.10.19",
-    "grunt": "^1.0.3",
+    "bootstrap": "^4.3.1",
+    "changelog-manager": "^1.0.0",
+    "grunt": "^1.0.4",
     "grunt-contrib-uglify": "^3.3.0"
   },
   "dependencies": {
     "datatables.net": "^1.10",
-    "jquery": "^3.3.1"
+    "jquery": "^3.4.0"
   }
 }

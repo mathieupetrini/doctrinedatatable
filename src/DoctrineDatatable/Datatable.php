@@ -39,6 +39,11 @@ class Datatable
     protected $query;
 
     /**
+     * @var QueryBuilder
+     */
+    protected $final_query;
+
+    /**
      * @var Column[]
      */
     protected $columns;
@@ -106,8 +111,7 @@ class Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param QueryBuilder $query
-     * @param mixed[]      $filters
+     * @param mixed[] $filters
      *
      * @return string[]
      *
@@ -115,14 +119,14 @@ class Datatable
      * @throws Exception\UnfilterableColumn
      * @throws Exception\WhereColumnNotHandle
      */
-    private function createCondition(QueryBuilder &$query, array $filters): array
+    private function createCondition(array $filters): array
     {
         $where = '';
         $having = '';
 
         foreach ($filters['columns'] as $index => $filter) {
             if (isset($this->columns[$index]) && !empty($filter['search']['value'])) {
-                $temp = '('.$this->columns[$index]->where($query, $filter['search']['value']).')';
+                $temp = '('.$this->columns[$index]->where($this->final_query, $filter['search']['value']).')';
 
                 $this->columns[$index]->isHaving() ?
                     $having .= (!empty($having) ? ' AND ' : '').$temp :
@@ -139,39 +143,36 @@ class Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param QueryBuilder $query
-     * @param bool         $withAlias (optional) (default=true)
+     * @param bool $withAlias (optional) (default=true)
      *
      * @return string
      */
-    private function processColumnIdentifier(QueryBuilder &$query, bool $withAlias = true): string
+    private function processColumnIdentifier(bool $withAlias = true): string
     {
-        return $query->getRootAliases()[0].'.'.$this->identifier.($withAlias ? ' AS '.$this->nameIdentifier : '');
+        return $this->final_query->getRootAliases()[0].'.'.$this->identifier.($withAlias ? ' AS '.$this->nameIdentifier : '');
     }
 
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param QueryBuilder $query
-     * @param Column       $column
+     * @param Column $column
      */
-    private function processColumnSelect(QueryBuilder &$query, Column $column): void
+    private function processColumnSelect(Column $column): void
     {
-        $query->addSelect($column->getName().' AS '.$column->getAlias());
+        $this->final_query->addSelect($column->getName().' AS '.$column->getAlias());
     }
 
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param QueryBuilder $query
-     * @param int          $index
-     * @param string       $direction
+     * @param int    $index
+     * @param string $direction
      *
      * @return Datatable
      */
-    private function orderBy(QueryBuilder &$query, int $index, string $direction): self
+    private function orderBy(int $index, string $direction): self
     {
-        $query->orderBy(
+        $this->final_query->orderBy(
             \array_slice($this->columns, $index, 1)[0]->getAlias(),
             $direction
         );
@@ -180,14 +181,13 @@ class Datatable
     }
 
     /**
-     * @param QueryBuilder $query
-     * @param mixed[]      $filters
+     * @param mixed[] $filters
      *
      * @return Datatable
      */
-    private function limit(QueryBuilder &$query, array $filters): self
+    private function limit(array $filters): self
     {
-        $query->setFirstResult($filters['start'] ?? 0)
+        $this->final_query->setFirstResult($filters['start'] ?? 0)
             ->setMaxResults($filters['length'] ?? $this->resultPerPage);
 
         return $this;
@@ -196,14 +196,12 @@ class Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param QueryBuilder $query
-     *
      * @return int
      */
-    private function count(QueryBuilder $query): int
+    private function count(): int
     {
-        $query = clone $query;
-        $result = $query->select('COUNT(DISTINCT '.$this->processColumnIdentifier($query, false).') as count')
+        $query = clone $this->final_query;
+        $result = $query->select('COUNT(DISTINCT '.$this->processColumnIdentifier(false).') as count')
             ->resetDQLPart('orderBy')
             ->setFirstResult(0)
             ->setMaxResults(null)
@@ -222,8 +220,7 @@ class Datatable
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param QueryBuilder $query
-     * @param mixed[]      $filters
+     * @param mixed[] $filters
      *
      * @return QueryBuilder
      *
@@ -231,7 +228,7 @@ class Datatable
      * @throws Exception\UnfilterableColumn
      * @throws Exception\WhereColumnNotHandle
      */
-    protected function createFoundationQuery(QueryBuilder &$query, array $filters): QueryBuilder
+    protected function createFoundationQuery(array $filters): QueryBuilder
     {
         // If global search we erase all specific where and only keep the unified filter
         if ($this->globalSearch && isset($filters['search']) && !empty($filters['search'][Column::GLOBAL_ALIAS])) {
@@ -239,18 +236,18 @@ class Datatable
         }
 
         $conditions = isset($filters['columns']) ?
-            $this->createCondition($query, $filters) :
+            $this->createCondition($filters) :
             array();
 
         if (isset($conditions['where']) && !empty($conditions['where'])) {
-            $query->andWhere($conditions['where']);
+            $this->final_query->andWhere($conditions['where']);
         }
 
         if (isset($conditions['having']) && !empty($conditions['having'])) {
-            $query->andHaving($conditions['having']);
+            $this->final_query->andHaving($conditions['having']);
         }
 
-        return $query;
+        return $this->final_query;
     }
 
     /**
@@ -258,38 +255,60 @@ class Datatable
      */
     protected function createQueryResult(): QueryBuilder
     {
-        $query = clone $this->query;
-        $query->select($this->processColumnIdentifier($query));
+        $this->final_query = clone $this->query;
+        $this->final_query->select($this->processColumnIdentifier());
         foreach ($this->columns as $column) {
-            $this->processColumnSelect($query, $column);
+            $this->processColumnSelect($column);
         }
 
-        return $query;
+        return $this->final_query;
     }
 
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
      *
-     * @param QueryBuilder $query
-     * @param int          $index
-     * @param string       $direction
+     * @param mixed[] $filters
      *
      * @return mixed[]
      */
-    protected function result(
-        QueryBuilder &$query,
-        int $index,
-        string $direction
-    ): array {
-        $this->orderBy($query, $index, $direction);
+    protected function data(array $filters): array
+    {
+        $this->limit($filters);
 
-        return $query->getQuery()
+        return $this->final_query
+            ->getQuery()
             ->getResult();
     }
 
     /**
      * PUBLIC METHODS.
      */
+
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @param mixed[] $filters
+     *
+     * @return QueryBuilder
+     *
+     * @throws Exception\ResolveColumnNotHandle
+     * @throws Exception\UnfilterableColumn
+     * @throws Exception\WhereColumnNotHandle
+     */
+    public function createFinalQuery(array $filters): QueryBuilder
+    {
+        $this->createQueryResult();
+        $this->orderBy(
+            isset($filters['order']) ?
+                $filters['order'][0]['column'] :
+                0,
+            isset($filters['order']) ?
+                $filters['order'][0]['dir'] :
+                'ASC'
+        );
+
+        return $this->createFoundationQuery($filters);
+    }
 
     /**
      * @author Mathieu Petrini <mathieupetrini@gmail.com>
@@ -304,23 +323,27 @@ class Datatable
      */
     public function get(array $filters): array
     {
-        $query = $this->createQueryResult();
-        $this->createFoundationQuery($query, $filters);
-
-        $data = $this->limit($query, $filters)->result(
-            $query,
-            isset($filters['order']) ?
-                $filters['order'][0]['column'] :
-                0,
-            isset($filters['order']) ?
-                $filters['order'][0]['dir'] :
-                'ASC'
-        );
+        $this->createFinalQuery($filters);
+        $data = $this->data($filters);
 
         return array(
-            'recordsTotal' => $this->count($query),
+            'recordsTotal' => $this->count(),
             'recordsFiltered' => \count($data),
             'data' => $data,
+        );
+    }
+
+    /**
+     * @author Mathieu Petrini <mathieupetrini@gmail.com>
+     *
+     * @return string
+     */
+    public function export(): string
+    {
+        return stream_get_contents(
+            (new Export())
+            ->setDatatable($this)
+            ->export()
         );
     }
 

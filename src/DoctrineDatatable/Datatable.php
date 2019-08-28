@@ -173,7 +173,7 @@ class Datatable
     private function orderBy(int $index, string $direction): self
     {
         $this->final_query->orderBy(
-            \array_slice($this->columns, $index, 1)[0]->getAlias(),
+            \array_slice($this->columns, $index, 1)[0]->getAliasOrderBy(),
             $direction
         );
 

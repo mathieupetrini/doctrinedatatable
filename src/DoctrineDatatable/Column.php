@@ -35,6 +35,11 @@ class Column
      */
     private $resolve;
 
+    /**
+     * @var string|callable|null
+     */
+    private $aliasOrderby;
+
     public const GLOBAL_ALIAS = 'value';
 
     /**
@@ -47,12 +52,13 @@ class Column
      * @param mixed|null $where   (string, \Doctrine\ORM\Query\Expr)
      * @param mixed|null $resolve (string, callable)
      */
-    public function __construct(string $alias, string $name, $where = '', $resolve = '')
+    public function __construct(string $alias, string $name, $where = '', $resolve = '', string $aliasOrderby = null)
     {
         $this->alias = $alias;
         $this->name = $name;
         $this->where = $where;
         $this->resolve = $resolve;
+        $this->aliasOrderby = $aliasOrderby ?? $alias;
     }
 
     /**
@@ -136,5 +142,13 @@ class Column
     public function isHaving(): bool
     {
         return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAliasOrderBy(): string
+    {
+        return $this->aliasOrderby;
     }
 }

@@ -141,6 +141,7 @@ class Editortable extends Datatable
             return array();
         }
 
+        $this->query->getEntityManager()->getUnitOfWork()->computeChangeSets();
         $this->query->getEntityManager()->flush($entities);
 
         return $this->createQueryResult()

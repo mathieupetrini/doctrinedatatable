@@ -202,6 +202,7 @@ class Datatable
     {
         $query = clone $this->final_query;
         $result = $query->select('COUNT(DISTINCT '.$this->processColumnIdentifier(false).') as count')
+            ->resetDQLPart('groupBy')
             ->resetDQLPart('orderBy')
             ->setFirstResult(0)
             ->setMaxResults(null)

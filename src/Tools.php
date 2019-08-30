@@ -16,10 +16,9 @@ class Tools
      *
      * @throws ReflectionException
      */
-    public static function callMethod($obj, string $name, array $args = array())
+    public function callMethod($obj, string $name, array $args = array())
     {
-        $class = new \ReflectionClass($obj);
-        $method = $class->getMethod($name);
+        $method = (new \ReflectionClass($obj))->getMethod($name);
         $method->setAccessible(true);
 
         return $method->invokeArgs(is_object($obj) ? $obj : null, $args);

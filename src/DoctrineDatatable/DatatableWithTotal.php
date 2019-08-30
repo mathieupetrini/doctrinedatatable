@@ -7,9 +7,9 @@ namespace DoctrineDatatable;
 use Doctrine\ORM\Query\ParserResult;
 
 /**
- * Class FacturationDatatable.
+ * Class DatatableWithTotal.
  */
-abstract class FacturationDatatable extends Datatable
+abstract class DatatableWithTotal extends Datatable
 {
     /**
      * ABSTRACT METHODS.
@@ -82,15 +82,16 @@ abstract class FacturationDatatable extends Datatable
      */
     private function count(): int
     {
+        $tools = new \Tools();
         $temp = (clone $this->final_query)
             ->setFirstResult(null)
             ->setMaxResults(null)
             ->getQuery();
 
         /** @var ParserResult $parser */
-        $parser = \Tools::callMethod($temp, '_parse');
+        $parser = $tools->callMethod($temp, '_parse');
 
-        list($sqlParams, $types) = \Tools::callMethod(
+        list($sqlParams, $types) = $tools->callMethod(
             $temp,
             'processParameterMappings',
             array(

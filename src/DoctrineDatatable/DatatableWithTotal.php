@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace DoctrineDatatable;
 
-use Doctrine\ORM\Query\ParserResult;
-
 /**
  * Class DatatableWithTotal.
  */
@@ -25,7 +23,7 @@ abstract class DatatableWithTotal extends Datatable
      */
 
     /**
-     * @return array
+     * @return float[]
      */
     private function calculTotaux(): array
     {
@@ -84,11 +82,11 @@ abstract class DatatableWithTotal extends Datatable
     {
         $tools = new Tools();
         $temp = (clone $this->final_query)
-            ->setFirstResult(null)
+            ->setFirstResult(0)
             ->setMaxResults(null)
             ->getQuery();
 
-        /** @var ParserResult $parser */
+        /** @var \Doctrine\ORM\Query\ParserResult $parser */
         $parser = $tools->callMethod($temp, '_parse');
 
         list($sqlParams, $types) = $tools->callMethod(
@@ -99,7 +97,8 @@ abstract class DatatableWithTotal extends Datatable
             )
         );
 
-        return (int) ((clone $this->final_query)->getEntityManager()->getConnection()
+        return (int) ((clone $this->final_query)->getEntityManager()
+            ->getConnection()
             ->executeQuery('SELECT COUNT(*) as total FROM ('.$temp->getSQL().') as t', $sqlParams, $types)
             ->fetch()['total']);
     }

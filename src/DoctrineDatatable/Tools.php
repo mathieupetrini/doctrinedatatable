@@ -10,9 +10,9 @@ namespace DoctrineDatatable;
 class Tools
 {
     /**
-     * @param mixed  $obj
-     * @param string $name
-     * @param array  $args
+     * @param mixed   $obj
+     * @param string  $name
+     * @param mixed[] $args
      *
      * @return mixed
      *
@@ -23,6 +23,6 @@ class Tools
         $method = (new \ReflectionClass($obj))->getMethod($name);
         $method->setAccessible(true);
 
-        return $method->invokeArgs(is_object($obj) ? $obj : null, $args);
+        return $method->invokeArgs(\is_object($obj) ? $obj : null, $args);
     }
 }

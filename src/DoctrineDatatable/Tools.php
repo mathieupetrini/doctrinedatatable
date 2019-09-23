@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace DoctrineDatatable;
+
 /**
  * Class Tools.
  */
@@ -14,7 +16,7 @@ class Tools
      *
      * @return mixed
      *
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function callMethod($obj, string $name, array $args = array())
     {

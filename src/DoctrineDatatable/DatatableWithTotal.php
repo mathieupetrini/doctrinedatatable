@@ -82,7 +82,7 @@ abstract class DatatableWithTotal extends Datatable
      */
     private function count(): int
     {
-        $tools = new \Tools();
+        $tools = new Tools();
         $temp = (clone $this->final_query)
             ->setFirstResult(null)
             ->setMaxResults(null)

@@ -34,7 +34,7 @@ abstract class DatatableWithTotal extends Datatable
 
         $index = 0;
         foreach ($this->getSumableColumns() as $alias => $column) {
-            0 === $index ?
+            0 == $index ?
                 $query->select("$column as $alias") :
                 $query->addSelect("$column as $alias");
 

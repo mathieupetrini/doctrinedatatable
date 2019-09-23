@@ -23,7 +23,8 @@ return [
     'directory_list' => [
         'src',
         'vendor/doctrine/orm/lib/Doctrine/ORM/',
-        'vendor/doctrine/persistence/lib/Doctrine/Common/Persistence/'
+        'vendor/doctrine/persistence/lib/Doctrine/Common/Persistence/',
+        'vendor/doctrine/dbal/lib/Doctrine/DBAL/',
     ],
 
     // A directory list that defines files that will be excluded

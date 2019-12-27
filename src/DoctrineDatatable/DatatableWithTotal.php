@@ -29,8 +29,7 @@ abstract class DatatableWithTotal extends Datatable
     {
         $query = clone $this->final_query;
 
-        $query->resetDQLPart('orderBy')
-            ->resetDQLPart('groupBy');
+        $query->resetDQLPart('orderBy');
 
         $index = 0;
         foreach ($this->getSumableColumns() as $alias => $column) {

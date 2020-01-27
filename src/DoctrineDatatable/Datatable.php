@@ -125,7 +125,7 @@ class Datatable
         $having = '';
 
         foreach ($filters['columns'] as $index => $filter) {
-            if (isset($this->columns[$index]) && !empty($filter['search']['value'])) {
+            if (isset($this->columns[$index]) && '' !== $filter['search']['value']) {
                 $temp = '('.$this->columns[$index]->where($this->final_query, $filter['search']['value']).')';
 
                 $this->columns[$index]->isHaving() ?

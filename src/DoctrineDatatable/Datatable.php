@@ -299,14 +299,12 @@ class Datatable
     public function createFinalQuery(array $filters): QueryBuilder
     {
         $this->createQueryResult();
-        $this->orderBy(
-            isset($filters['order']) ?
-                $filters['order'][0]['column'] :
-                0,
-            isset($filters['order']) ?
-                $filters['order'][0]['dir'] :
-                'ASC'
-        );
+        if (isset($filters['order'])) {
+            $this->orderBy(
+                $filters['order'][0]['column'],
+                $filters['order'][0]['dir']
+            );   
+        }
 
         return $this->createFoundationQuery($filters);
     }
